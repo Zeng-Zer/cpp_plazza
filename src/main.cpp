@@ -13,7 +13,7 @@ int main(int argc, char *argv[]) {
     return -1;
   }
 
-  std::cout << "nb of thread: " << nbThread << std::endl;
+  std::cout << "nb of thread: " << *nbThread << std::endl;
 
   return 0;
 }

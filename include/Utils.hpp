@@ -4,7 +4,7 @@
 # include "Option.hpp"
 
 namespace Utils {
-  Option<int> getNumber(std::string const& str);
+  Option<int> getOptNumber(std::string const& str);
 }
 
 #endif /* !UTILS_HPP_ */

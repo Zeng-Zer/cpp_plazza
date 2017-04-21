@@ -7,7 +7,7 @@ int main(int argc, char *argv[]) {
     return -1;
   }
 
-  Option<int> nbThread = Utils::getNumber(argv[1]);
+  Option<int> nbThread = Utils::getOptNumber(argv[1]);
   if (!nbThread) {
     std::cerr << "\"" << argv[1] << "\" is not a number" << std::endl;
     return -1;

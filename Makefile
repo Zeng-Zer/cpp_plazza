@@ -8,11 +8,12 @@
 ## Last update Sat Jul  2 21:56:26 2016 David Zeng
 ##
 
-NAME :=		a.out
+NAME :=		plazza
 SRCDIR :=	src/
 INCLUDE :=	include/
 
-SRC :=		main.cpp
+SRC :=		main.cpp \
+		Utils.cpp
 
 CXX :=		g++
 CXXFLAGS :=	-W -Wall -Wextra -g -std=c++14

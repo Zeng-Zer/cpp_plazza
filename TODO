@@ -1,0 +1,26 @@
+Class Plazza :
+      - Instancie les process
+      - Parse les instructions STDIN
+      - Envoie les instructions aux process (gérer le load-balancing)
+      - Affiche sur la STDOUT les résultats
+      - Sauvegarde les logs dans un fichier
+
+Class Process :
+      - Encapsule la création d'un process
+      - Contient un pool de thread (std::vector ?)
+      - Instancie les threads
+      - Répartie les tâches sur les threads
+
+Class Thread :
+      - Encapsule la création d'un thread
+      - Exécute l'instruction donnée via le Scrapper
+      - Stock le résulat via un Named Pipe / Unix Socket / Network Socket
+
+Class Communication :
+      - Encapsule la création d'un Named Pipe / Unix Socket / Network Socket
+      - Stock des données pour les transmettre à la class Plazza
+
+Class Scrapper :
+      - Scrape le fichier pour récupérer les informations demandées
+
+Bonus : Métriques

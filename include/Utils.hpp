@@ -3,6 +3,9 @@
 
 # include "Option.hpp"
 
+/**
+ * Util functions go here
+ */
 namespace Utils {
   Option<int> getOptNumber(std::string const& str);
 }

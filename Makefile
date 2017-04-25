@@ -13,7 +13,8 @@ SRCDIR :=	src/
 INCLUDE :=	include/
 
 SRC :=		main.cpp \
-		Utils.cpp
+		Utils.cpp \
+		Plazza.cpp \
 
 CXX :=		g++
 CXXFLAGS :=	-W -Wall -Wextra -g -std=c++14

@@ -50,9 +50,9 @@ private:
   bool isProcessFull(pid_t pid) const;
 
   /**
-   * parse string to get the next task
+   * parse string to get the next tasks
    */
-  Option<Task> readTask(std::string const& line) const;
+  std::vector<Task> readTask(std::string const& line) const;
 
 private:
   int const _nbThread;

@@ -2,6 +2,7 @@
 #include <sys/wait.h>
 #include <string.h>
 #include <sstream>
+#include <algorithm>
 #include "Plazza.hpp"
 #include "Utils.hpp"
 
@@ -72,21 +73,21 @@ void Plazza::parseSTDIN() {
     while (getline(ss, cmd, ';')) {
       cmd = Utils::trim(cmd);
 
-      Option<Task> task = readTask(cmd);
-      if (task) {
-	_tasks.push(*task);
-      }
+      std::vector<Task> tasks = readTask(cmd);
+      std::for_each(tasks.begin(), tasks.end(), [this] (Task const& task) {
+	  _tasks.push(task);
+	});
     }
 
   }
 }
 
 // TODO read stdin
-Option<Task> Plazza::readTask(std::string const& line) const {
+std::vector<Task> Plazza::readTask(std::string const& line) const {
   // TODO REMOVE THIS DEBUG
   std::cout << line << std::endl;
 
-  return Option<Task>();
+  return {};
 }
 
 // TODO IS PROCESS FULL

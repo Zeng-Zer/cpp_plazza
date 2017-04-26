@@ -14,8 +14,16 @@ enum Information {
  * Structure defining a task to be sent to processes
  */
 struct Task {
-  std::vector<std::string> files;
+  std::string file;
   Information info;
+};
+
+/**
+ * structure to pass around ICommunication
+ */
+union Package {
+  Task task;
+  long threadAvailable;
 };
 
 #endif /* !TASK_HPP_ */

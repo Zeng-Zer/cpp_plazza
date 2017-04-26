@@ -22,6 +22,6 @@ Class Thread :
       - Stock le résulat via un Named Pipe / Unix Socket / Network Socket
 
 Class Scrapper :
-      - Scrape le fichier pour récupérer les informations demandées
+      - Scrape(parse) le fichier pour récupérer les informations demandées
 
 Bonus : Métriques

@@ -1,5 +1,6 @@
 #include <iostream>
 #include "Utils.hpp"
+#include "Plazza.hpp"
 
 int main(int argc, char *argv[]) {
   if (argc != 2) {
@@ -14,6 +15,10 @@ int main(int argc, char *argv[]) {
   }
 
   std::cout << "nb of thread: " << *nbThread << std::endl;
+
+  Plazza plazza(nbThread);
+
+  plazza.parseSTDIN();
 
   return 0;
 }

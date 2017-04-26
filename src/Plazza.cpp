@@ -1,7 +1,9 @@
 #include <csignal>
 #include <sys/wait.h>
 #include <string.h>
+#include <sstream>
 #include "Plazza.hpp"
+#include "Utils.hpp"
 
 Plazza::Plazza(int nbThread) : _nbThread(nbThread) {
   // handle child death
@@ -60,8 +62,30 @@ pid_t Plazza::getAvailableProcess() const {
   return -1;
 }
 
+void Plazza::parseSTDIN() {
+  std::string line;
+  std::string cmd;
+
+  while (getline(std::cin, line)) {
+    std::istringstream ss(line);
+
+    while (getline(ss, cmd, ';')) {
+      cmd = Utils::trim(cmd);
+
+      Option<Task> task = readTask(cmd);
+      if (task) {
+	_tasks.push(*task);
+      }
+    }
+
+  }
+}
+
 // TODO read stdin
-Option<Task> Plazza::readTask() const {
+Option<Task> Plazza::readTask(std::string const& line) const {
+  // TODO REMOVE THIS DEBUG
+  std::cout << line << std::endl;
+
   return Option<Task>();
 }
 

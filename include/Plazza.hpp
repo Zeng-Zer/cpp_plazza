@@ -38,9 +38,10 @@ public:
   pid_t getAvailableProcess() const;
 
   /**
-   * parse stdin to get the next task
+   * read tasks from stdin
+   * push tasks on the queue
    */
-  Option<Task> readTask() const;
+  void parseSTDIN();
 
 private:
   /**
@@ -48,8 +49,14 @@ private:
    */
   bool isProcessFull(pid_t pid) const;
 
+  /**
+   * parse string to get the next task
+   */
+  Option<Task> readTask(std::string const& line) const;
+
 private:
   int const _nbThread;
+  std::queue<Task> _tasks;
   std::map<pid_t, std::unique_ptr<ICommunication>> _processes;
 };
 

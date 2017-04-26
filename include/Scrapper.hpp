@@ -1,6 +1,10 @@
 #ifndef SCRAPPER_HPP_
 # define SCRAPPER_HPP_
 
+# include <string>
+# include <vector>
+# include "Task.hpp"
+
 /**
  * Scrape web pages to retrieve an information
  * Parsing
@@ -10,7 +14,10 @@ public:
   Scrapper();
   ~Scrapper();
 
-  // TODO method to parse document
+  /**
+   * parse a file to retrieve data
+   */
+  std::vector<std::string> parseDocument(std::string const& file, Information info);
 
 private:
 

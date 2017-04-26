@@ -8,6 +8,7 @@
  */
 namespace Utils {
   Option<int> getOptNumber(std::string const& str);
+  std::string trim(std::string str);
 }
 
 #endif /* !UTILS_HPP_ */

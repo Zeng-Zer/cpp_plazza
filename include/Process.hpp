@@ -14,12 +14,14 @@
 class Process {
 public:
   Process(int nbThread);
-  ~Process() = default;
+  ~Process();
 
   /**
    * main method
    */
   void run();
+
+  pid_t getPid() const;
 
 private:
   /**
@@ -43,6 +45,7 @@ private:
   Option<Task> receiveTask();
 
 private:
+  pid_t _pid;
   int const _nbThread;
   std::queue<Task> _tasks;
   std::vector<std::shared_ptr<Thread>> _threads;

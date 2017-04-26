@@ -22,7 +22,10 @@ public:
    */
   void sendTask(pid_t process, Task const& task);
 
-
+  /**
+   * delete a process by its pid
+   */
+  void deleteProcess(pid_t pid);
 
 private:
   int const _nbThread;

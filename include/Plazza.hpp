@@ -2,11 +2,15 @@
 # define PLAZZA_HPP_
 
 # include <memory>
-# include <vector>
+# include <map>
 # include <unistd.h>
 # include "Process.hpp"
 # include "Task.hpp"
+# include "ICommunication.hpp"
 
+/**
+ * Main class communicating to processes
+ */
 class Plazza {
 public:
   Plazza(int nbThread);
@@ -15,21 +19,38 @@ public:
   /**
    * create a new process
    */
-  void createProcess(); // TODO TBD PARAMETER
+  void createProcess();
 
   /**
    * send task to a process
    */
-  void sendTask(pid_t process, Task const& task);
+  void sendTask(pid_t process, Task const& task) const;
 
   /**
    * delete a process by its pid
    */
   void deleteProcess(pid_t pid);
 
+  /**
+   * get a process that is available to work
+   * return -1 if there isn't any available process
+   */
+  pid_t getAvailableProcess() const;
+
+  /**
+   * parse stdin to get the next task
+   */
+  Option<Task> readTask() const;
+
+private:
+  /**
+   * get process status: number of tasks in the queue
+   */
+  bool isProcessFull(pid_t pid) const;
+
 private:
   int const _nbThread;
-  std::vector<pid_t> _processes;
+  std::map<pid_t, std::unique_ptr<ICommunication>> _processes;
 };
 
 #endif /* !PLAZZA_HPP_ */

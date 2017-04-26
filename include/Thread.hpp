@@ -1,6 +1,9 @@
 #ifndef THREAD_HPP_
 # define THREAD_HPP_
 
+/**
+ * class that encapsulate a thread
+ */
 class Thread {
 public:
   Thread();

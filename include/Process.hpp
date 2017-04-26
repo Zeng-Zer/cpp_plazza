@@ -7,6 +7,7 @@
 # include "Option.hpp"
 # include "Thread.hpp"
 # include "Task.hpp"
+# include "ICommunication.hpp"
 
 /**
  * Class that encapsulate a process
@@ -17,7 +18,7 @@ public:
   ~Process();
 
   /**
-   * main method
+   * main method: producer
    */
   void run();
 
@@ -25,7 +26,7 @@ public:
 
 private:
   /**
-   * create a thread
+   * create a thread: consumer
    */
   void createThread(); // TODO TBD PARAMETER
 
@@ -42,10 +43,17 @@ private:
   /**
    * Receive task
    */
-  Option<Task> receiveTask();
+  Option<Task> receiveTask() const;
+
+  /**
+   * timeout suicide
+   * kill thead and kill itself
+   */
+  void timeoutSuicide();
 
 private:
   pid_t _pid;
+  std::unique_ptr<ICommunication> _com;
   int const _nbThread;
   std::queue<Task> _tasks;
   std::vector<std::shared_ptr<Thread>> _threads;

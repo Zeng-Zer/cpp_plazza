@@ -34,8 +34,7 @@ void Process::run() {
     // timeout if it hasn't been working for 5 seconds
     if (!_tasks.empty()) { // TODO ADD CONDITION VAR ?
       start = now;
-    } else if (std::chrono::duration_cast<std::chrono::milliseconds>
-	       (now - start).count() >= 5000) {
+    } else if (std::chrono::duration_cast<std::chrono::seconds>(now - start).count() >= 5) {
       timeoutSuicide();
     }
 

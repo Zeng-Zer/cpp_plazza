@@ -4,8 +4,9 @@
 # include <memory>
 # include <vector>
 # include <queue>
+# include <thread>
+# include <mutex>
 # include "Option.hpp"
-# include "Thread.hpp"
 # include "Task.hpp"
 # include "ICommunication.hpp"
 
@@ -21,8 +22,6 @@ public:
    * main method: producer
    */
   void run();
-
-  pid_t getPid() const;
 
 private:
   /**
@@ -52,11 +51,11 @@ private:
   void timeoutSuicide();
 
 private:
-  pid_t _pid;
   std::unique_ptr<ICommunication> _com;
   int const _nbThread;
   std::queue<Task> _tasks;
-  std::vector<std::shared_ptr<Thread>> _threads;
+  std::vector<std::thread> _threads;
+  std::mutex _mutex;
 };
 
 #endif /* !PROCESS_HPP_ */

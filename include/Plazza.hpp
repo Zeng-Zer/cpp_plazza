@@ -4,7 +4,10 @@
 # include <memory>
 # include <map>
 # include <unistd.h>
-# include "Process.hpp"
+# include <queue>
+# include <thread>
+# include <mutex>
+# include "Option.hpp"
 # include "Task.hpp"
 # include "ICommunication.hpp"
 
@@ -19,7 +22,7 @@ public:
   /**
    * create a new process
    */
-  void createProcess();
+  pid_t createProcess();
 
   /**
    * send task to a process
@@ -43,6 +46,16 @@ public:
    */
   void parseSTDIN();
 
+  /**
+   * pop next task from the queue
+   */
+  Option<Task> getNextTask();
+
+  /**
+   * return true if the program completed all of its tasks
+   */
+  bool isRunning() const;
+
 private:
   /**
    * get process status: number of tasks in the queue
@@ -58,6 +71,10 @@ private:
   int const _nbThread;
   std::queue<Task> _tasks;
   std::map<pid_t, std::unique_ptr<ICommunication>> _processes;
+  std::thread _producer;
+  std::mutex _mutex;
+
+  bool _finished;
 };
 
 #endif /* !PLAZZA_HPP_ */

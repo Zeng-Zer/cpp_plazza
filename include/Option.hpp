@@ -31,7 +31,7 @@ public:
     return !_hasValue;
   }
 
-  T operator*() {
+  T& operator*() {
     assert(_hasValue);
     return _value;
   }
@@ -41,7 +41,7 @@ public:
     return &_value;
   }
 
-  T operator*() const {
+  T const& operator*() const {
     assert(_hasValue);
     return _value;
   }

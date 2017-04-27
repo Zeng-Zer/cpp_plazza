@@ -34,8 +34,8 @@ Plazza::~Plazza() {
 }
 
 pid_t Plazza::createProcess() {
-  Fork process;
   std::unique_ptr<ICommunication> com; // TODO open a socket ?
+  Fork process;
 
   // fork failed
   if (process.getPid() == -1) {
@@ -44,7 +44,7 @@ pid_t Plazza::createProcess() {
   // child process here
   else if (process.getPid() == 0) {
     int nb = _nbThread;
-    process.run([nb] () {
+    process.run([&com, nb] () {
 	Process proc(nb);
 	proc.run();
       });
@@ -93,11 +93,9 @@ void Plazza::parseSTDIN() {
 
 	  std::vector<Task> tasks = readTask(cmd);
 
-	  _mutex.lock();
 	  std::for_each(tasks.begin(), tasks.end(), [this] (Task const& task) {
 	      _tasks.push(task);
 	    });
-	  _mutex.unlock();
 	}
 
       }
@@ -107,15 +105,7 @@ void Plazza::parseSTDIN() {
 }
 
 Option<Task> Plazza::getNextTask() {
-  if (_tasks.empty()) {
-    return {};
-  }
-
-  _mutex.lock();
-  Option<Task> task(_tasks.front());
-  _tasks.pop();
-  _mutex.unlock();
-  return task;
+  return _tasks.timedPop(10);
 }
 
 bool Plazza::isRunning() const {
@@ -129,6 +119,7 @@ bool Plazza::isProcessFull(pid_t pid) const {
 }
 
 std::vector<Task> Plazza::readTask(std::string const& line) const {
+  // TODO REMOVE DEBUG HERE
   std::cout << "got: " << line << std::endl;
   std::vector<std::string> tokens;
   std::string str;

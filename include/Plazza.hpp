@@ -4,12 +4,12 @@
 # include <memory>
 # include <map>
 # include <unistd.h>
-# include <queue>
 # include <thread>
 # include <mutex>
 # include "Option.hpp"
 # include "Task.hpp"
 # include "ICommunication.hpp"
+# include "BlockingQueue.hpp"
 
 /**
  * Main class communicating to processes
@@ -69,10 +69,9 @@ private:
 
 private:
   int const _nbThread;
-  std::queue<Task> _tasks;
+  BlockingQueue<Task> _tasks;
   std::map<pid_t, std::unique_ptr<ICommunication>> _processes;
   std::thread _producer;
-  std::mutex _mutex;
 
   bool _finished;
 };

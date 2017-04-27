@@ -27,6 +27,7 @@ int main(int argc, char *argv[]) {
   Plazza plazza(nbThread);
 
   plazza.parseSTDIN();
+
   while (plazza.isRunning()) {
     Option<Task> task = plazza.getNextTask();
     if (!task) {
@@ -46,6 +47,5 @@ int main(int argc, char *argv[]) {
   }
 
   std::cout << "end" << std::endl;
-
   return 0;
 }

@@ -3,12 +3,13 @@
 
 # include <memory>
 # include <vector>
-# include <queue>
 # include <thread>
 # include <mutex>
+# include <condition_variable>
 # include "Option.hpp"
 # include "Task.hpp"
 # include "ICommunication.hpp"
+# include "BlockingQueue.hpp"
 
 /**
  * Class that encapsulate a process
@@ -27,7 +28,7 @@ private:
   /**
    * create a thread: consumer
    */
-  void createThread(); // TODO TBD PARAMETER
+  void createThread(int id); // TODO TBD PARAMETER
 
   /**
    * check whether the process can get another task or not
@@ -35,27 +36,30 @@ private:
   bool isFull() const;
 
   /**
-   * Push task to _tasks queue
-   */
-  void pushCommand(Task const& task);
-
-  /**
    * Receive task
    */
   Option<Task> receiveTask() const;
 
   /**
+   * stop the current process
    * timeout suicide
    * kill thead and kill itself
    */
-  void timeoutSuicide();
+  void stop();
+
+  /**
+   * check whether the process is working or not
+   */
+  bool isWorking() const;
 
 private:
   std::unique_ptr<ICommunication> _com;
   int const _nbThread;
-  std::queue<Task> _tasks;
+  BlockingQueue<Task> _tasks;
   std::vector<std::thread> _threads;
+  std::vector<bool> _thEmpty;
   std::mutex _mutex;
+  bool _running;
 };
 
 #endif /* !PROCESS_HPP_ */

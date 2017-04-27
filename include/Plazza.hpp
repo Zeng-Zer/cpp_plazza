@@ -38,7 +38,7 @@ public:
    * get a process that is available to work
    * return -1 if there isn't any available process
    */
-  pid_t getAvailableProcess() const;
+  Option<pid_t> getAvailableProcess() const;
 
   /**
    * read tasks from stdin

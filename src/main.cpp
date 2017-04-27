@@ -34,8 +34,8 @@ int main(int argc, char *argv[]) {
       continue;
     }
 
-    pid_t process = plazza.getAvailableProcess();
-    if (process == -1) {
+    Option<pid_t> process = plazza.getAvailableProcess();
+    if (process) {
       try {
 	process = plazza.createProcess();
       } catch (ProcessException const& e) {

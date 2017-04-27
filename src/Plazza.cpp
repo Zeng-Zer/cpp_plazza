@@ -75,9 +75,9 @@ void Plazza::deleteProcess(pid_t pid) {
   // com->close();
 }
 
-pid_t Plazza::getAvailableProcess() const {
+Option<pid_t> Plazza::getAvailableProcess() const {
   // TODO GET AVAILABLE PROCESS
-  return -1;
+  return {};
 }
 
 void Plazza::parseSTDIN() {

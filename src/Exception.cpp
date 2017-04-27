@@ -15,3 +15,6 @@ InformationException::InformationException(std::string const& msg) : Exception(m
 
 ProcessException::ProcessException(std::string const& msg) : Exception(msg) {
 }
+
+CommunicationException::CommunicationException(std::string const& msg) : Exception(msg) {
+}

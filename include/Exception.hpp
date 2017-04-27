@@ -31,4 +31,12 @@ public:
   ProcessException(std::string const& msg);
 };
 
+/**
+ * communication failure
+ */
+class CommunicationException : public Exception {
+public:
+  CommunicationException(std::string const& msg);
+};
+
 #endif /* !EXCEPTION_HPP_ */

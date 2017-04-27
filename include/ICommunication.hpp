@@ -10,7 +10,7 @@ public:
 
   // TODO Method to communicate between plazza and process
 
-  virtual int openCommunication() = 0; // TODO TBD PARAMETER
+  virtual void openCommunication() = 0; // TODO TBD PARAMETER
 
   /**
    * send a msg

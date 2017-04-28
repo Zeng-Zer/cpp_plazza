@@ -67,11 +67,10 @@ void Plazza::processTask(Task const& task) {
     } catch (ProcessException const& e) {
       std::cerr << e.what() << std::endl;
     }
-
-    usleep(1000000);
-    sendTask(pid, task);
-    sendTask(pid, task);
   }
+
+  usleep(100000);
+  sendTask(pid, task);
 }
 
 pid_t Plazza::createProcess() {
@@ -104,7 +103,6 @@ void Plazza::sendPkg(pid_t process, Package pkg) const {
 void Plazza::sendTask(pid_t process, Task const& task) const {
   Package pkg = {TASK, .content = {.task = task}};
 
-  std::cout << "sending task : " << task.file << std::endl;
   sendPkg(process, pkg);
 }
 

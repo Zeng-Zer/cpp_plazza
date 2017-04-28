@@ -54,9 +54,9 @@ void Plazza::run() {
   }
 
 
-  sleep(7);
+  killAll();
+  usleep(100000);
   std::cout << "end" << std::endl;
-  // killAll();
 }
 
 void Plazza::processTask(Task const& task) {
@@ -120,6 +120,7 @@ void Plazza::deleteProcess(pid_t pid) {
 
 void Plazza::killAll() {
   for (auto const& process : _processes) {
+    std::cout << "killing " << process.first << std::endl;
     killProcess(process.first);
   }
 }
@@ -129,7 +130,7 @@ void Plazza::killProcess(pid_t pid) {
     return;
   }
 
-  kill(SIGTERM, pid);
+  kill(pid, SIGTERM);
 
   std::unique_ptr<ICommunication> com = std::move(_processes[pid]);
 

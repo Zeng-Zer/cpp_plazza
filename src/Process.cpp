@@ -1,12 +1,26 @@
 #include <unistd.h>
 #include <algorithm>
 #include <chrono>
+#include <csignal>
 #include "Process.hpp"
 #include "Scrapper.hpp"
 #include "Exception.hpp"
 
 Process::Process(int nbThread, std::unique_ptr<ICommunication> const& com)
   : _nbThread(nbThread), _com(com), _running(true) {
+  std::cout << "pid: " << getpid() << std::endl;
+  static auto handler = [this] (int sig) {
+    if (sig != SIGTERM) {
+      return;
+    }
+
+    std::cout << "stopping" << std::endl;
+    stop();
+  };
+
+  signal(SIGTERM, [] (int sig) {
+      handler(sig);
+    });
 }
 
 Process::~Process() {
@@ -77,8 +91,7 @@ void Process::createThread(int id) {
 	    try {
 	      std::vector<std::string> result = scrapper.parseDocument(task->file, task->info);
 	      for (std::string const& str : result) {
-		// TODO DEBUG
-		std::cout << "found: " << str << std::endl;
+		std::cout << str << std::endl;
 	      }
 	    } catch (FileException const& e) {
 	      std::cerr << e.what() << std::endl;
@@ -92,6 +105,7 @@ void Process::createThread(int id) {
 }
 
 void Process::stop() {
+  while (isWorking());
   _running = false;
 
   for (std::thread& th : _threads) {

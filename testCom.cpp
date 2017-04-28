@@ -9,6 +9,7 @@ int main()
 
   test.type = QUIT;
   test.content.value = 0;
+  yolo.openCommunicationMain();
 
   int pid = fork();
   if (pid == 0)
@@ -20,8 +21,9 @@ int main()
     }
   else
     {
-      yolo.openCommunicationMain();
       yolo.sendMsg(test);
     }
+  yolo.close();
+  yolo.rmfifo();
   return (0);
 }

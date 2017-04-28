@@ -12,7 +12,9 @@ public:
 
   // TODO Method to communicate between plazza and process
 
-  virtual void openCommunication() = 0;
+  virtual void openCommunicationMain() = 0;
+  virtual void openCommunicationChild() = 0;
+
   /**
    * send a msg
    */

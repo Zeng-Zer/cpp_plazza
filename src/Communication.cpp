@@ -18,7 +18,7 @@ Communication::~Communication()
 {
 }
 
-void Communication::openCommunication()
+void Communication::openCommunicationMain()
 {
   std::string oPath(PFIFO + std::to_string(_outputId));
   std::string iPath(PFIFO + std::to_string(_inputId));
@@ -26,10 +26,18 @@ void Communication::openCommunication()
   int fifo = mkfifo(oPath.c_str(), 0666);
   if (fifo == -1)
     throw CommunicationException("Error on create named pipe");
+  fifo = mkfifo(iPath.c_str(), 0666);
+  if (fifo == -1)
+    throw CommunicationException("Error on create named pipe");
   _outputPipe.open(oPath, std::ofstream::out | std::ofstream::binary);
   if (!_outputPipe.is_open())
     throw CommunicationException("Error on open output named pipe");
   // _inputPipe.open(iPath, std::ifstream::in | std::ifstream::binary);
+}
+
+void Communication::openCommunicationChild()
+{
+  
 }
 
 void Communication::sendMsg(Package& msg)
@@ -39,9 +47,9 @@ void Communication::sendMsg(Package& msg)
 
 Package& Communication::receiveMsg()
 {
-  Package msg;
-  _inputPipe.read(reinterpret_cast<char*>(&msg), sizeof(Package));
-  return (msg);
+  Package *msg = new Package;
+  _inputPipe.read(reinterpret_cast<char*>(msg), sizeof(Package));
+  return (*msg);
 }
 
 void Communication::close()

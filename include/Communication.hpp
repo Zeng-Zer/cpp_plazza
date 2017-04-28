@@ -15,10 +15,11 @@ public:
   Communication(int id);
   ~Communication();
 
-  void openCommunication();
-  void sendMsg(Package&);
-  Package& receiveMsg();
-  void close();
+  void openCommunicationMain() override;
+  void openCommunicationChild() override;
+  void sendMsg(Package&) override;
+  Package& receiveMsg() override;
+  void close() override;
 private:
   int _outputId;
   int _inputId;

@@ -5,11 +5,11 @@
 #include "Scrapper.hpp"
 #include "Exception.hpp"
 
-Process::Process(int nbThread) : _nbThread(nbThread), _running(true) {
+Process::Process(int nbThread, std::unique_ptr<ICommunication> const& com)
+  : _nbThread(nbThread), _com(com), _running(true) {
 }
 
 Process::~Process() {
-
 }
 
 void Process::run() {

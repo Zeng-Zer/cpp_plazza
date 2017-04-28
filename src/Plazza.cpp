@@ -8,6 +8,7 @@
 #include "Process.hpp"
 #include "Utils.hpp"
 #include "Exception.hpp"
+#include "Communication.hpp"
 
 Plazza::Plazza(int nbThread) : _nbThread(nbThread), _finished(true) { // TODO set finished to false
   // handle child death
@@ -35,7 +36,7 @@ Plazza::~Plazza() {
 
 pid_t Plazza::createProcess() {
   std::cout << "new process" << std::endl;
-  std::unique_ptr<ICommunication> com; // TODO open a socket ?
+  std::unique_ptr<ICommunication> com(new Communication(0)); // TODO open a socket ?
   Fork process;
 
   // fork failed
@@ -46,7 +47,7 @@ pid_t Plazza::createProcess() {
   else if (process.getPid() == 0) {
     int nb = _nbThread;
     process.run([&com, nb] () {
-	Process proc(nb);
+	Process proc(nb, com);
 	proc.run();
       });
     exit(0);
@@ -68,6 +69,19 @@ void Plazza::deleteProcess(pid_t pid) {
   if (!_processes.count(pid)) {
     return;
   }
+
+  // TODO ADD COMMUNICATION
+  // std::unique_ptr<ICommunication> com = std::move(_processes[pid]);
+
+  _processes.erase(_processes.find(pid));
+  // com->close();
+}
+
+void Plazza::killProcess(pid_t pid) {
+  if (!_processes.count(pid)) {
+    return;
+  }
+  kill(SIGTERM, pid);
 
   // TODO ADD COMMUNICATION
   // std::unique_ptr<ICommunication> com = std::move(_processes[pid]);

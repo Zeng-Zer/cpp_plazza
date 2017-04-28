@@ -35,6 +35,11 @@ public:
   void deleteProcess(pid_t pid);
 
   /**
+   * kill the process
+   */
+  void killProcess(pid_t pid);
+
+  /**
    * get a process that is available to work
    * return -1 if there isn't any available process
    */

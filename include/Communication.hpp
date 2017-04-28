@@ -2,11 +2,12 @@
 # define COMMUNICATION_HPP_
 
 #include <string>
-#include <fcntl.h>
+#include <fstream>
 #include <sys/stat.h>
-#include <sys/types.h>
-#include <unistd.h>
 #include "ICommunication.hpp"
+#include "Exception.hpp"
+
+# define PFIFO "/tmp/plazza"
 
 class Communication : public ICommunication
 {
@@ -15,10 +16,13 @@ public:
   ~Communication();
 
   void openCommunication();
+  void sendMsg(Package&);
+  void close();
 private:
-  int _id;
-  int _fifo;
-  int _fd;
+  int _outputId;
+  int _inputId;
+  std::ofstream _outputPipe;
+  std::ifstream _inputPipe;
 };
 
 #endif /* !COMMUNICATION_HPP_ */

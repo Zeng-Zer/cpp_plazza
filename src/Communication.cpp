@@ -51,12 +51,12 @@ void Communication::sendMsg(Package msg)
 Package Communication::receiveMsg()
 {
   Package msg;
-  int r;
 
-  r = read(_fdInputPipe, reinterpret_cast<char*>(&msg), sizeof(Package));
   msg.type = UNDEFINED;
-  if (r == 0)
+  msg.content.value = -1;
+  if (read(_fdInputPipe, reinterpret_cast<char*>(&msg), sizeof(Package)) <= 0)
     {
+      msg.type = UNDEFINED;
       msg.content.value = -1;
     }
   return (msg);

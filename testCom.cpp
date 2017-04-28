@@ -16,21 +16,23 @@ int main()
       usleep(10000);
       std::cout << "child" << std::endl;
       yolo.openCommunicationChild();
+      usleep(10000);
       std::cout << "receiving" << std::endl;
-      Package testo = yolo.receiveMsg();
+      Package testo;
+      testo = yolo.receiveMsg();
       std::cout << "received!" << std::endl;
       if (!(testo.type == UNDEFINED || test.content.value == -1))
 	std::cout << testo.content.value << std::endl;
-      // else
-      // 	std::cout << "yolo-fzepojfzep" << std::endl;
+      else
+      	std::cout << "yolo-fzepojfzep" << std::endl;
     }
   else
     {
       std::cout << "parent" << std::endl;
       yolo.openCommunicationMain();
-      usleep(999999);
       std::cout << "sending" << std::endl;
       yolo.sendMsg(test);
+      usleep(999999);
     }
   yolo.close();
   yolo.rmfifo();

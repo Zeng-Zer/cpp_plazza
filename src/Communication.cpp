@@ -1,8 +1,17 @@
 #include "Communication.hpp"
 
 Communication::Communication(int id)
-  :_outputId(id % 2), _inputId(id % 2)
 {
+  if (id % 2)
+    {
+      _outputId = id;
+      _inputId = id++;
+    }
+  else
+    {
+      _outputId = id;
+      _inputId = id++;
+    }
 }
 
 Communication::~Communication()
@@ -23,7 +32,7 @@ void Communication::openCommunication()
   // _inputPipe.open(iPath, std::ifstream::in | std::ifstream::binary);
 }
 
-void Communication::sendMsg() const
+void Communication::sendMsg(Package& msg)
 {
-
+  _outputPipe.write(reinterpret_cast<char*>(&msg), sizeof(Package));
 }

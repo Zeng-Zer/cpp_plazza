@@ -3,9 +3,7 @@
 
 #include <string>
 #include <fstream>
-#include <fcntl.h>
 #include <sys/stat.h>
-#include <unistd.h>
 #include "ICommunication.hpp"
 #include "Exception.hpp"
 
@@ -18,7 +16,7 @@ public:
   ~Communication();
 
   void openCommunication();
-  void sendMsg() const;
+  void sendMsg(Package&);
 private:
   int _outputId;
   int _inputId;

@@ -1,6 +1,8 @@
 #ifndef ICOMMUNICATION_HPP_
 # define ICOMMUNICATION_HPP_
 
+#include "Task.hpp"
+
 /**
  * interface to sockets/pipe
  */
@@ -15,7 +17,7 @@ public:
   /**
    * send a msg
    */
-  virtual void sendMsg() const = 0; // TODO TBD PARAMETER
+  virtual void sendMsg(Package&) = 0; // TODO TBD PARAMETER
 
   /**
    * rcv a msg

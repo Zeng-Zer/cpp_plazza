@@ -2,8 +2,8 @@
 # define COMMUNICATION_HPP_
 
 #include <string>
-#include <fstream>
 #include <sys/stat.h>
+#include <fcntl.h>
 #include <unistd.h>
 #include "ICommunication.hpp"
 #include "Exception.hpp"
@@ -24,8 +24,8 @@ public:
   void rmfifo() override;
 private:
   int _id;
-  std::ofstream _outputPipe;
-  std::ifstream _inputPipe;
+  int _fdOutputPipe;
+  int _fdInputPipe;
 };
 
 #endif /* !COMMUNICATION_HPP_ */

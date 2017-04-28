@@ -22,11 +22,11 @@ void Communication::openCommunicationMain()
   if (fifo == -1)
     throw CommunicationException("Parent: Error while create named pipe");
 
-  _outputPipe.open(oPath, std::ofstream::out | std::ofstream::binary);
-  if (!_outputPipe.is_open())
+  _fdOutputPipe = open(oPath.c_str(), O_RDWR | O_CREAT | O_NONBLOCK);
+  if (_fdOutputPipe == -1)
     throw CommunicationException("Parent: Error while opening output named pipe");
-  _inputPipe.open(iPath, std::ifstream::in | std::ifstream::binary);
-  if (!_inputPipe.is_open())
+  _fdInputPipe = open(iPath.c_str(), O_RDWR | O_CREAT | O_NONBLOCK);
+  if (_fdInputPipe == -1)
     throw CommunicationException("Parent: Error while opening input named pipe");
 }
 
@@ -35,24 +35,26 @@ void Communication::openCommunicationChild()
   std::string oPath(PFIFO + std::to_string(_id + 1));
   std::string iPath(PFIFO + std::to_string(_id));
 
-  _inputPipe.open(iPath, std::ifstream::in | std::ifstream::binary);
-  if (!_inputPipe.is_open())
+  _fdInputPipe = open(iPath.c_str(), O_RDWR | O_CREAT | O_NONBLOCK);
+  if (_fdInputPipe == -1)
     throw CommunicationException("Child: Error while opening input named pipe");
-  _outputPipe.open(oPath, std::ofstream::out | std::ofstream::binary);
-  if (!_outputPipe.is_open())
+  _fdOutputPipe = open(oPath.c_str(), O_RDWR | O_CREAT | O_NONBLOCK);
+  if (_fdOutputPipe == -1)
     throw CommunicationException("Child: Error while opening output named pipe");
 }
 
 void Communication::sendMsg(Package msg)
 {
-  _outputPipe.write(reinterpret_cast<char*>(&msg), sizeof(Package));
+  write(_fdOutputPipe, reinterpret_cast<char*>(&msg), sizeof(Package));
 }
 
 Package Communication::receiveMsg()
 {
   Package msg;
-  _inputPipe.read(reinterpret_cast<char*>(&msg), sizeof(Package));
-  if (_inputPipe.fail())
+  int r;
+
+  r = read(_fdInputPipe, reinterpret_cast<char*>(&msg), sizeof(Package));
+  if (r == 0)
     {
       msg.type = UNDEFINED;
       msg.content.value = -1;
@@ -62,8 +64,8 @@ Package Communication::receiveMsg()
 
 void Communication::close()
 {
-  _outputPipe.close();
-  _inputPipe.close();
+  ::close(_fdOutputPipe);
+  ::close(_fdInputPipe);
 }
 
 void Communication::rmfifo()

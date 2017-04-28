@@ -4,6 +4,7 @@
 #include <string>
 #include <fstream>
 #include <sys/stat.h>
+#include <unistd.h>
 #include "ICommunication.hpp"
 #include "Exception.hpp"
 
@@ -17,12 +18,12 @@ public:
 
   void openCommunicationMain() override;
   void openCommunicationChild() override;
-  void sendMsg(Package&) override;
-  Package& receiveMsg() override;
+  void sendMsg(Package) override;
+  Package receiveMsg(PackageType) override;
   void close() override;
+  void rmfifo() override;
 private:
-  int _outputId;
-  int _inputId;
+  int _id;
   std::ofstream _outputPipe;
   std::ifstream _inputPipe;
 };

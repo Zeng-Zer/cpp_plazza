@@ -18,17 +18,18 @@ public:
   /**
    * send a msg
    */
-  virtual void sendMsg(Package&) = 0;
+  virtual void sendMsg(Package) = 0;
 
   /**
    * rcv a msg
    */
-  virtual Package& receiveMsg() = 0;
+  virtual Package receiveMsg(PackageType) = 0;
 
   /**
    * close the communication
    */
   virtual void close() = 0;
+  virtual void rmfifo() = 0;
 };
 
 #endif /* !ICOMMUNICATION_HPP_ */

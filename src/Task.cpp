@@ -1,3 +1,4 @@
+#include <string.h>
 #include "Task.hpp"
 #include "Exception.hpp"
 
@@ -13,4 +14,8 @@ Information Info::fromString(std::string const& str) {
   }
 
   throw InformationException("Unrecognized information: " + str);
+}
+
+Package::Message::Message() {
+  bzero(this, sizeof(Message));
 }

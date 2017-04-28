@@ -3,6 +3,7 @@
 Communication::Communication(int id)
   : _id(id)
 {
+  rmfifo();
 }
 
 Communication::~Communication()

@@ -38,9 +38,8 @@ struct Package {
   PackageType type;
 
   // content of the package
-  union Message {
-    Message();
-    Task task;
+  union {
+    Task task();
     long value;
   } content;
 };

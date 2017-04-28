@@ -17,6 +17,7 @@ public:
 
   void openCommunication();
   void sendMsg(Package&);
+  void close();
 private:
   int _outputId;
   int _inputId;

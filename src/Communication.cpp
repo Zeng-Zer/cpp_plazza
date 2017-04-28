@@ -36,3 +36,9 @@ void Communication::sendMsg(Package& msg)
 {
   _outputPipe.write(reinterpret_cast<char*>(&msg), sizeof(Package));
 }
+
+void Communication::close()
+{
+  _outputPipe.close();
+  _inputPipe.close();
+}

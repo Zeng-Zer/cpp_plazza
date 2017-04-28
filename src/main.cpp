@@ -15,6 +15,11 @@ static int getParamThread(int argc, char *argv[]) {
     return -1;
   }
 
+  if (*nbThread < 1) {
+    std::cerr << *nbThread << " must be superior of 1" << std::endl;
+    return -1;
+  }
+
   return *nbThread;
 }
 
@@ -34,8 +39,8 @@ int main(int argc, char *argv[]) {
       continue;
     }
 
-    Option<pid_t> process = plazza.getAvailableProcess();
-    if (process) {
+    pid_t process = plazza.getAvailableProcess();
+    if (process == -1) {
       try {
 	process = plazza.createProcess();
       } catch (ProcessException const& e) {

@@ -34,6 +34,7 @@ Plazza::~Plazza() {
 }
 
 pid_t Plazza::createProcess() {
+  std::cout << "new process" << std::endl;
   std::unique_ptr<ICommunication> com; // TODO open a socket ?
   Fork process;
 
@@ -75,9 +76,9 @@ void Plazza::deleteProcess(pid_t pid) {
   // com->close();
 }
 
-Option<pid_t> Plazza::getAvailableProcess() const {
+pid_t Plazza::getAvailableProcess() const {
   // TODO GET AVAILABLE PROCESS
-  return {};
+  return -1;
 }
 
 void Plazza::parseSTDIN() {

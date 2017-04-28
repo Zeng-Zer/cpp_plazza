@@ -2,6 +2,8 @@
 #include <algorithm>
 #include <chrono>
 #include "Process.hpp"
+#include "Scrapper.hpp"
+#include "Exception.hpp"
 
 Process::Process(int nbThread) : _nbThread(nbThread), _running(true) {
 }
@@ -40,22 +42,31 @@ void Process::run() {
   }
 }
 
-// TODO ADD SCRAPPER HERE
 void Process::createThread(int id) {
   _thEmpty.push_back(false);
   _threads.push_back(std::thread([this, id] {
-	while (_running) {
-	  std::cout << "id: " << id << ", running" << std::endl;
+	Scrapper scrapper;
 
+	while (_running) {
 	  Option<Task> task = _tasks.timedPop(1000);
 	  if (task) {
 	    _thEmpty[id] = false;
-	    // TODO DEBUG
-	    std::cout << task->file << std::endl;
+
+	    try {
+	      std::vector<std::string> result = scrapper.parseDocument(task->file, task->info);
+	      for (std::string const& str : result) {
+		// TODO DEBUG
+		std::cout << "found: " << str << std::endl;
+	      }
+	    } catch (FileException const& e) {
+	      std::cerr << e.what() << std::endl;
+	    }
+
 	  } else {
 	    _thEmpty[id] = true;
 	  }
 	}
+
       }));
 }
 

@@ -39,4 +39,12 @@ public:
   CommunicationException(std::string const& msg);
 };
 
+/**
+ * file opening failure
+ */
+class FileException : public Exception {
+public:
+  FileException(std::string const& msg);
+};
+
 #endif /* !EXCEPTION_HPP_ */

@@ -18,3 +18,6 @@ ProcessException::ProcessException(std::string const& msg) : Exception(msg) {
 
 CommunicationException::CommunicationException(std::string const& msg) : Exception(msg) {
 }
+
+FileException::FileException(std::string const& msg) : Exception(msg) {
+}

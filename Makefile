@@ -18,6 +18,7 @@ SRC :=		main.cpp \
 		Utils.cpp \
 		Plazza.cpp \
 		Process.cpp \
+		Scrapper.cpp \
 		Exception.cpp \
 
 CXX :=		g++

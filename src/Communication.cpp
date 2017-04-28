@@ -34,12 +34,12 @@ void Communication::openCommunicationChild()
   std::string oPath(PFIFO + std::to_string(_id + 1));
   std::string iPath(PFIFO + std::to_string(_id));
 
-  _outputPipe.open(oPath, std::ofstream::out);
-  if (!_outputPipe.is_open())
-    throw CommunicationException("Error on open output named pipe");
   _inputPipe.open(iPath, std::ifstream::in);
   if (!_inputPipe.is_open())
     throw CommunicationException("Error on open input named pipe");
+  _outputPipe.open(oPath, std::ofstream::out);
+  if (!_outputPipe.is_open())
+    throw CommunicationException("Error on open output named pipe");
 }
 
 void Communication::sendMsg(Package msg)

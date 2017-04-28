@@ -24,21 +24,40 @@ void Process::run() {
     std::chrono::time_point<std::chrono::system_clock> now;
     now = std::chrono::system_clock::now();
 
-    Option<Task> task = receiveTask();
-
-    // process task here
-    if (task) {
-      _tasks.push(*task);
-      start = now;
-    }
+    handleMsg();
 
     // timeout if it hasn't been working for 5 seconds
-    if (!_tasks.empty()) { // TODO ADD CONDITION VAR ?
+    if (isWorking()) {
       start = now;
     } else if (std::chrono::duration_cast<std::chrono::seconds>(now - start).count() >= 5) {
       stop();
     }
 
+  }
+}
+
+void Process::handleMsg() {
+  Package pkg = _com->receiveMsg();
+
+  switch (pkg.type) {
+  case QUIT:
+    stop();
+    break;
+  case OCCUPIED_SLOT:
+    pkg.content.value = _tasks.size();
+    for (bool val : _thEmpty) {
+      if (!val) {
+	++pkg.content.value;
+      }
+    }
+    _com->sendMsg(pkg);
+    break;
+  case TASK:
+    std::cout << "got: " << pkg.content.task.file << std::endl;
+    _tasks.push(pkg.content.task);
+    break;
+  case UNDEFINED:
+    break;
   }
 }
 
@@ -68,15 +87,6 @@ void Process::createThread(int id) {
 	}
 
       }));
-}
-
-bool Process::isFull() const {
-  return _tasks.size() >= (_nbThread * 2ul);
-}
-
-// TODO RECEIVE TASK
-Option<Task> Process::receiveTask() const {
-  return {};
 }
 
 void Process::stop() {

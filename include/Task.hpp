@@ -15,7 +15,7 @@ enum Information {
  * Structure defining a task to be sent to processes
  */
 struct Task {
-  std::string file;
+  char file[256];
   Information info;
 };
 
@@ -39,8 +39,8 @@ struct Package {
   PackageType type;
 
   // content of the package
-  union {
-    Task task();
+  union Content {
+    Task task;
     long value;
   } content;
 };

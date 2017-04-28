@@ -36,7 +36,7 @@ Plazza::~Plazza() {
 
 pid_t Plazza::createProcess() {
   std::cout << "new process" << std::endl;
-  std::unique_ptr<ICommunication> com(new Communication(0)); // TODO open a socket ?
+  std::unique_ptr<ICommunication> com(new Communication(_processes.size() * 2));
   Fork process;
 
   // fork failed
@@ -46,6 +46,7 @@ pid_t Plazza::createProcess() {
   // child process here
   else if (process.getPid() == 0) {
     int nb = _nbThread;
+    com->openCommunicationChild();
     process.run([&com, nb] () {
 	Process proc(nb, com);
 	proc.run();
@@ -54,15 +55,21 @@ pid_t Plazza::createProcess() {
   }
   // parent process
   else {
+    com->openCommunicationMain();
     _processes[process.getPid()] = std::move(com);
     return process.getPid();
   }
 }
 
-// TODO SEND TASK
+void Plazza::sendPkg(pid_t process, Package pkg) const {
+  std::unique_ptr<ICommunication> const& com = _processes.at(process);
+  com->sendMsg(pkg);
+}
+
 void Plazza::sendTask(pid_t process, Task const& task) const {
-  (void)process;
-  (void)task;
+  Package pkg = {TASK, .content = {.task = task}};
+
+  sendPkg(process, pkg);
 }
 
 void Plazza::deleteProcess(pid_t pid) {
@@ -70,28 +77,41 @@ void Plazza::deleteProcess(pid_t pid) {
     return;
   }
 
-  // TODO ADD COMMUNICATION
-  // std::unique_ptr<ICommunication> com = std::move(_processes[pid]);
+  std::unique_ptr<ICommunication> com = std::move(_processes[pid]);
 
   _processes.erase(_processes.find(pid));
-  // com->close();
+  com->close();
+  com->rmfifo();
 }
 
+// TODO Kill process ?
 void Plazza::killProcess(pid_t pid) {
   if (!_processes.count(pid)) {
     return;
   }
   kill(SIGTERM, pid);
 
-  // TODO ADD COMMUNICATION
   // std::unique_ptr<ICommunication> com = std::move(_processes[pid]);
 
-  _processes.erase(_processes.find(pid));
+  // _processes.erase(_processes.find(pid));
   // com->close();
 }
 
 pid_t Plazza::getAvailableProcess() const {
-  // TODO GET AVAILABLE PROCESS
+  for (auto const& process : _processes) {
+    pid_t pid = process.first;
+    Package pkg = {OCCUPIED_SLOT, .content = {.value = -1}};
+    auto const& com = process.second;
+
+    sendPkg(pid, pkg);
+    while (pkg.content.value == -1) {
+      pkg = com->receiveMsg();
+    }
+
+    if (pkg.content.value < _nbThread * 2) {
+      return pid;
+    }
+  }
   return -1;
 }
 
@@ -127,12 +147,6 @@ bool Plazza::isRunning() const {
   return !_finished || _producer.joinable();
 }
 
-// TODO IS PROCESS FULL
-bool Plazza::isProcessFull(pid_t pid) const {
-  (void)pid;
-  return true;
-}
-
 std::vector<Task> Plazza::readTask(std::string const& line) const {
   // TODO REMOVE DEBUG HERE
   std::cout << "got: " << line << std::endl;
@@ -160,7 +174,10 @@ std::vector<Task> Plazza::readTask(std::string const& line) const {
 
   std::vector<Task> tasks;
   for (std::string const& file : tokens) {
-    tasks.push_back({file, info});
+    Task task;
+    task.info = info;
+    strcpy(task.file, file.c_str());
+    tasks.push_back(task);
   }
 
   return tasks;

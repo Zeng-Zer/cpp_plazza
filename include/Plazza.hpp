@@ -25,6 +25,11 @@ public:
   pid_t createProcess();
 
   /**
+   * send a package to the process
+   */
+  void sendPkg(pid_t process, Package pkg) const;
+
+  /**
    * send task to a process
    */
   void sendTask(pid_t process, Task const& task) const;
@@ -62,11 +67,6 @@ public:
   bool isRunning() const;
 
 private:
-  /**
-   * get process status: number of tasks in the queue
-   */
-  bool isProcessFull(pid_t pid) const;
-
   /**
    * parse string to get the next tasks
    */

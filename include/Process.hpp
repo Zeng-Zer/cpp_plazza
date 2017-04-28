@@ -26,19 +26,14 @@ public:
 
 private:
   /**
+   * handle msg
+   */
+  void handleMsg();
+
+  /**
    * create a thread: consumer
    */
-  void createThread(int id); // TODO TBD PARAMETER
-
-  /**
-   * check whether the process can get another task or not
-   */
-  bool isFull() const;
-
-  /**
-   * Receive task
-   */
-  Option<Task> receiveTask() const;
+  void createThread(int id);
 
   /**
    * stop the current process

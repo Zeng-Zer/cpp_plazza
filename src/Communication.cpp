@@ -21,12 +21,12 @@ void Communication::openCommunicationMain()
   if (fifo == -1)
     throw CommunicationException("Error on create named pipe");
 
-  _outputPipe.open(oPath, std::ofstream::out | std::ofstream::binary);
+  _outputPipe.open(oPath, std::ofstream::out);
   if (!_outputPipe.is_open())
     throw CommunicationException("Error on open output named pipe");
-  _inputPipe.open(iPath, std::ifstream::in | std::ifstream::binary);
+  _inputPipe.open(iPath, std::ifstream::in);
   if (!_inputPipe.is_open())
-    throw CommunicationException("Error on open output named pipe");
+    throw CommunicationException("Error on open input named pipe");
 }
 
 void Communication::openCommunicationChild()
@@ -34,12 +34,12 @@ void Communication::openCommunicationChild()
   std::string oPath(PFIFO + std::to_string(_id + 1));
   std::string iPath(PFIFO + std::to_string(_id));
 
-  _outputPipe.open(oPath, std::ofstream::out | std::ofstream::binary);
+  _outputPipe.open(oPath, std::ofstream::out);
   if (!_outputPipe.is_open())
     throw CommunicationException("Error on open output named pipe");
-  _inputPipe.open(iPath, std::ifstream::in | std::ifstream::binary);
+  _inputPipe.open(iPath, std::ifstream::in);
   if (!_inputPipe.is_open())
-    throw CommunicationException("Error on open output named pipe");
+    throw CommunicationException("Error on open input named pipe");
 }
 
 void Communication::sendMsg(Package msg)
@@ -47,7 +47,7 @@ void Communication::sendMsg(Package msg)
   _outputPipe.write(reinterpret_cast<char*>(&msg), sizeof(Package));
 }
 
-Package Communication::receiveMsg(PackageType type)
+Package Communication::receiveMsg()
 {
   Package msg;
   _inputPipe.read(reinterpret_cast<char*>(&msg), sizeof(Package));

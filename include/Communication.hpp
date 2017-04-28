@@ -19,7 +19,7 @@ public:
   void openCommunicationMain() override;
   void openCommunicationChild() override;
   void sendMsg(Package) override;
-  Package receiveMsg(PackageType) override;
+  Package receiveMsg() override;
   void close() override;
   void rmfifo() override;
 private:

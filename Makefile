@@ -19,6 +19,7 @@ SRC :=		main.cpp \
 		Plazza.cpp \
 		Process.cpp \
 		Exception.cpp \
+		Communication.cpp \
 
 CXX :=		g++
 CXXFLAGS :=	-W -Wall -Wextra -g -std=c++14 -pthread

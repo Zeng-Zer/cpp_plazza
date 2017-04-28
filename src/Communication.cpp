@@ -15,7 +15,7 @@ void Communication::openCommunicationMain()
   std::string oPath(PFIFO + std::to_string(_id));
   std::string iPath(PFIFO + std::to_string(_id + 1));
 
-  int fifo = mkfifo(oPath.c_str(), 0666);
+  int fifo = mkfifo(oPath.c_str(), S_IRWXU);
   if (fifo == -1)
     throw CommunicationException("Parent: Error while creating named pipe");
   fifo = mkfifo(iPath.c_str(), 0666);
@@ -54,9 +54,9 @@ Package Communication::receiveMsg()
   int r;
 
   r = read(_fdInputPipe, reinterpret_cast<char*>(&msg), sizeof(Package));
+  msg.type = UNDEFINED;
   if (r == 0)
     {
-      msg.type = UNDEFINED;
       msg.content.value = -1;
     }
   return (msg);

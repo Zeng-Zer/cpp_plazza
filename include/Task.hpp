@@ -39,7 +39,7 @@ struct Package {
 
   // content of the package
   union {
-    Task task;
+    Task task();
     long value;
   } content;
 };

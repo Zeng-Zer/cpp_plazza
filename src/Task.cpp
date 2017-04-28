@@ -15,7 +15,3 @@ Information Info::fromString(std::string const& str) {
 
   throw InformationException("Unrecognized information: " + str);
 }
-
-Package::Message::Message() {
-  bzero(this, sizeof(Message));
-}

@@ -17,7 +17,8 @@ int main()
       std::cout << "child" << std::endl;
       yolo.openCommunicationChild();
       Package testo = yolo.receiveMsg();
-      std::cout << testo.content.value << std::endl;
+      if (!(testo.type == UNDEFINED || test.content.value == -1))
+	std::cout << testo.content.value << std::endl;
     }
   else
     {

@@ -51,6 +51,11 @@ Package Communication::receiveMsg()
 {
   Package msg;
   _inputPipe.read(reinterpret_cast<char*>(&msg), sizeof(Package));
+  if (_inputPipe.fail())
+    {
+      msg.type = UNDEFINED;
+      msg.content.value = -1;
+    }
   return (msg);
 }
 

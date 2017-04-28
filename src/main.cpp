@@ -27,14 +27,15 @@ int main(int argc, char *argv[]) {
   Plazza plazza(nbThread);
 
   plazza.parseSTDIN();
+
   while (plazza.isRunning()) {
     Option<Task> task = plazza.getNextTask();
     if (!task) {
       continue;
     }
 
-    pid_t process = plazza.getAvailableProcess();
-    if (process == -1) {
+    Option<pid_t> process = plazza.getAvailableProcess();
+    if (process) {
       try {
 	process = plazza.createProcess();
       } catch (ProcessException const& e) {
@@ -46,6 +47,5 @@ int main(int argc, char *argv[]) {
   }
 
   std::cout << "end" << std::endl;
-
   return 0;
 }

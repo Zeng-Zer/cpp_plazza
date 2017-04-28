@@ -12,17 +12,16 @@ public:
 
   // TODO Method to communicate between plazza and process
 
-  virtual void openCommunication() = 0; // TODO TBD PARAMETER
-
+  virtual void openCommunication() = 0;
   /**
    * send a msg
    */
-  virtual void sendMsg(Package&) = 0; // TODO TBD PARAMETER
+  virtual void sendMsg(Package&) = 0;
 
   /**
    * rcv a msg
    */
-  virtual void receiveMsg() const = 0; // TODO TBD PARAMETER
+  virtual Package& receiveMsg() = 0;
 
   /**
    * close the communication

@@ -6,15 +6,10 @@
 
 class Fork {
 public:
-  Fork();
+  Fork(std::function<void()>f);
   ~Fork();
 
-  pid_t getPid();
-
-  /**
-   * run the function give in parameter
-   */
-  void run(std::function<void()> f);
+  pid_t getPid() const;
 
 private:
   pid_t _pid;

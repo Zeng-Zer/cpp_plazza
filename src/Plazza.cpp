@@ -10,7 +10,7 @@
 #include "Exception.hpp"
 #include "Communication.hpp"
 
-Plazza::Plazza(int nbThread) : _nbThread(nbThread), _finished(true) { // TODO set finished to false
+Plazza::Plazza(int nbThread) : _nbThread(nbThread) {
   // handle child death
   static auto handler = [this] (int) {
     pid_t pid;
@@ -34,27 +34,62 @@ Plazza::Plazza(int nbThread) : _nbThread(nbThread), _finished(true) { // TODO se
 Plazza::~Plazza() {
 }
 
-pid_t Plazza::createProcess() {
-  std::cout << "new process" << std::endl;
-  std::unique_ptr<ICommunication> com(new Communication(_processes.size() * 2));
-  Fork process;
+void Plazza::run() {
+  std::string line;
+  std::string cmd;
 
-  // fork failed
+  while (getline(std::cin, line)) {
+    std::istringstream ss(line);
+
+    while (getline(ss, cmd, ';')) {
+      cmd = Utils::trim(cmd);
+
+      std::vector<Task> tasks = readTask(cmd);
+
+      std::for_each(tasks.begin(), tasks.end(), [this] (Task const& task) {
+	  processTask(task);
+	});
+    }
+
+  }
+
+
+  sleep(7);
+  std::cout << "end" << std::endl;
+  // killAll();
+}
+
+void Plazza::processTask(Task const& task) {
+  pid_t pid = getAvailableProcess();
+  if (pid == -1) {
+    try {
+      pid = createProcess();
+    } catch (ProcessException const& e) {
+      std::cerr << e.what() << std::endl;
+    }
+
+    usleep(1000000);
+    sendTask(pid, task);
+    sendTask(pid, task);
+  }
+}
+
+pid_t Plazza::createProcess() {
+  std::cout << "new process, id: " << _processes.size() * 2 << std::endl;
+  std::unique_ptr<ICommunication> com(new Communication(_processes.size() * 2));
+  int nb = _nbThread;
+
+  // child process here
+  Fork process([&com, nb] () {
+      com->openCommunicationChild();
+      Process proc(nb, com);
+      proc.run();
+      exit(0);
+    });
+
   if (process.getPid() == -1) {
     throw ProcessException("Process initialization failed");
-  }
-  // child process here
-  else if (process.getPid() == 0) {
-    int nb = _nbThread;
-    com->openCommunicationChild();
-    process.run([&com, nb] () {
-	Process proc(nb, com);
-	proc.run();
-      });
-    exit(0);
-  }
-  // parent process
-  else {
+  } else {
     com->openCommunicationMain();
     _processes[process.getPid()] = std::move(com);
     return process.getPid();
@@ -69,6 +104,7 @@ void Plazza::sendPkg(pid_t process, Package pkg) const {
 void Plazza::sendTask(pid_t process, Task const& task) const {
   Package pkg = {TASK, .content = {.task = task}};
 
+  std::cout << "sending task : " << task.file << std::endl;
   sendPkg(process, pkg);
 }
 
@@ -84,17 +120,24 @@ void Plazza::deleteProcess(pid_t pid) {
   com->rmfifo();
 }
 
-// TODO Kill process ?
+void Plazza::killAll() {
+  for (auto const& process : _processes) {
+    killProcess(process.first);
+  }
+}
+
 void Plazza::killProcess(pid_t pid) {
   if (!_processes.count(pid)) {
     return;
   }
+
   kill(SIGTERM, pid);
 
-  // std::unique_ptr<ICommunication> com = std::move(_processes[pid]);
+  std::unique_ptr<ICommunication> com = std::move(_processes[pid]);
 
-  // _processes.erase(_processes.find(pid));
-  // com->close();
+  _processes.erase(_processes.find(pid));
+  com->close();
+  com->rmfifo();
 }
 
 pid_t Plazza::getAvailableProcess() const {
@@ -103,53 +146,20 @@ pid_t Plazza::getAvailableProcess() const {
     Package pkg = {OCCUPIED_SLOT, .content = {.value = -1}};
     auto const& com = process.second;
 
-    sendPkg(pid, pkg);
-    while (pkg.content.value == -1) {
-      pkg = com->receiveMsg();
+    com->sendMsg(pkg);
+    Package res = com->receiveMsg();
+    while (res.type == UNDEFINED) {
+      res = com->receiveMsg();
     }
-
-    if (pkg.content.value < _nbThread * 2) {
+    if (res.type == OCCUPIED_SLOT && res.content.value < _nbThread *2) {
+      std::cout << "got this pid: " << pid << ", used slot: " << res.content.value << std::endl;
       return pid;
     }
   }
   return -1;
 }
 
-void Plazza::parseSTDIN() {
-  _producer = std::thread([this] () {
-      std::string line;
-      std::string cmd;
-
-      while (getline(std::cin, line)) {
-	std::istringstream ss(line);
-
-	while (getline(ss, cmd, ';')) {
-	  cmd = Utils::trim(cmd);
-
-	  std::vector<Task> tasks = readTask(cmd);
-
-	  std::for_each(tasks.begin(), tasks.end(), [this] (Task const& task) {
-	      _tasks.push(task);
-	    });
-	}
-
-      }
-      // notify main that the thread is done
-      _producer.detach();
-    });
-}
-
-Option<Task> Plazza::getNextTask() {
-  return _tasks.timedPop(10);
-}
-
-bool Plazza::isRunning() const {
-  return !_finished || _producer.joinable();
-}
-
 std::vector<Task> Plazza::readTask(std::string const& line) const {
-  // TODO REMOVE DEBUG HERE
-  std::cout << "got: " << line << std::endl;
   std::vector<std::string> tokens;
   std::string str;
   std::stringstream sstr(line);

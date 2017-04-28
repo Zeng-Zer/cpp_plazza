@@ -1,17 +1,16 @@
 #include "Fork.hpp"
 
-Fork::Fork() {
+Fork::Fork(std::function<void()>f) {
   _pid = fork();
+  if (_pid == 0) {
+    f();
+  }
 }
 
 Fork::~Fork() {
 
 }
 
-void Fork::run(std::function<void()> f) {
-  f();
-}
-
-pid_t Fork::getPid() {
+pid_t Fork::getPid() const {
   return _pid;
 }

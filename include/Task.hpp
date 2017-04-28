@@ -28,6 +28,7 @@ enum PackageType {
   TASK,
   OCCUPIED_SLOT,
   QUIT,
+  RESPONSE,
   UNDEFINED
 };
 

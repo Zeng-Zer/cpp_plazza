@@ -32,7 +32,6 @@ void Process::run() {
     } else if (std::chrono::duration_cast<std::chrono::seconds>(now - start).count() >= 5) {
       stop();
     }
-
   }
 }
 
@@ -50,24 +49,28 @@ void Process::handleMsg() {
 	++pkg.content.value;
       }
     }
+    std::cout << "size: " << pkg.content.value << std::endl;
+    usleep(100000);
     _com->sendMsg(pkg);
     break;
   case TASK:
-    std::cout << "got: " << pkg.content.task.file << std::endl;
+    std::cout << "th got: " << pkg.content.task.file << std::endl;
     _tasks.push(pkg.content.task);
     break;
-  case UNDEFINED:
+  default:
     break;
   }
 }
 
 void Process::createThread(int id) {
-  _thEmpty.push_back(false);
+  _thEmpty.push_back(true);
   _threads.push_back(std::thread([this, id] {
 	Scrapper scrapper;
 
 	while (_running) {
-	  Option<Task> task = _tasks.timedPop(1000);
+	  _thEmpty[id] = true;
+
+	  Option<Task> task = _tasks.timedPop(100);
 	  if (task) {
 	    _thEmpty[id] = false;
 
@@ -81,9 +84,8 @@ void Process::createThread(int id) {
 	      std::cerr << e.what() << std::endl;
 	    }
 
-	  } else {
-	    _thEmpty[id] = true;
 	  }
+
 	}
 
       }));

@@ -30,27 +30,7 @@ int main(int argc, char *argv[]) {
   }
 
   Plazza plazza(nbThread);
+  plazza.run();
 
-  plazza.parseSTDIN();
-
-  while (plazza.isRunning()) {
-    Option<Task> task = plazza.getNextTask();
-    if (!task) {
-      continue;
-    }
-
-    pid_t process = plazza.getAvailableProcess();
-    if (process == -1) {
-      try {
-	process = plazza.createProcess();
-      } catch (ProcessException const& e) {
-	std::cerr << e.what() << std::endl;
-      }
-    }
-
-    plazza.sendTask(process, *task);
-  }
-
-  std::cout << "end" << std::endl;
   return 0;
 }

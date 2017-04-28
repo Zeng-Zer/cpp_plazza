@@ -20,6 +20,11 @@ public:
   ~Plazza();
 
   /**
+   * run the whole plazza program
+   */
+  void run();
+
+  /**
    * create a new process
    */
   pid_t createProcess();
@@ -40,9 +45,9 @@ public:
   void deleteProcess(pid_t pid);
 
   /**
-   * kill the process
+   * kill every process
    */
-  void killProcess(pid_t pid);
+  void killAll();
 
   /**
    * get a process that is available to work
@@ -51,20 +56,9 @@ public:
   pid_t getAvailableProcess() const;
 
   /**
-   * read tasks from stdin
-   * push tasks on the queue
+   * process task
    */
-  void parseSTDIN();
-
-  /**
-   * pop next task from the queue
-   */
-  Option<Task> getNextTask();
-
-  /**
-   * return true if the program completed all of its tasks
-   */
-  bool isRunning() const;
+  void processTask(Task const& task);
 
 private:
   /**
@@ -72,13 +66,14 @@ private:
    */
   std::vector<Task> readTask(std::string const& line) const;
 
+  /**
+   * kill the process
+   */
+  void killProcess(pid_t pid);
+
 private:
   int const _nbThread;
-  BlockingQueue<Task> _tasks;
   std::map<pid_t, std::unique_ptr<ICommunication>> _processes;
-  std::thread _producer;
-
-  bool _finished;
 };
 
 #endif /* !PLAZZA_HPP_ */

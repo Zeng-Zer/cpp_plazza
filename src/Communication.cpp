@@ -16,17 +16,17 @@ void Communication::openCommunicationMain()
 
   int fifo = mkfifo(oPath.c_str(), 0666);
   if (fifo == -1)
-    throw CommunicationException("Error on create named pipe");
+    throw CommunicationException("Parent: Error while creating named pipe");
   fifo = mkfifo(iPath.c_str(), 0666);
   if (fifo == -1)
-    throw CommunicationException("Error on create named pipe");
+    throw CommunicationException("Parent: Error while create named pipe");
 
   _outputPipe.open(oPath, std::ofstream::out | std::ofstream::binary);
   if (!_outputPipe.is_open())
-    throw CommunicationException("Error on open output named pipe");
+    throw CommunicationException("Parent: Error while opening output named pipe");
   _inputPipe.open(iPath, std::ifstream::in | std::ifstream::binary);
   if (!_inputPipe.is_open())
-    throw CommunicationException("Error on open input named pipe");
+    throw CommunicationException("Parent: Error while opening input named pipe");
 }
 
 void Communication::openCommunicationChild()
@@ -36,10 +36,10 @@ void Communication::openCommunicationChild()
 
   _inputPipe.open(iPath, std::ifstream::in | std::ifstream::binary);
   if (!_inputPipe.is_open())
-    throw CommunicationException("Error on open input named pipe");
+    throw CommunicationException("Child: Error while opening input named pipe");
   _outputPipe.open(oPath, std::ofstream::out | std::ofstream::binary);
   if (!_outputPipe.is_open())
-    throw CommunicationException("Error on open output named pipe");
+    throw CommunicationException("Child: Error while opening output named pipe");
 }
 
 void Communication::sendMsg(Package msg)

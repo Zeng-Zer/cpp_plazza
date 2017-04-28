@@ -47,7 +47,7 @@ void Communication::sendMsg(Package msg)
   _outputPipe.write(reinterpret_cast<char*>(&msg), sizeof(Package));
 }
 
-Package Communication::receiveMsg(PackageType type)
+Package Communication::receiveMsg()
 {
   Package msg;
   _inputPipe.read(reinterpret_cast<char*>(&msg), sizeof(Package));

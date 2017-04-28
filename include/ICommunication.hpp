@@ -23,7 +23,7 @@ public:
   /**
    * rcv a msg
    */
-  virtual Package receiveMsg(PackageType) = 0;
+  virtual Package receiveMsg() = 0;
 
   /**
    * close the communication

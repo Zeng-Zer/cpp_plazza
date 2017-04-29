@@ -96,9 +96,11 @@ void Process::createThread(int id) {
 	    }
 
 	    // write the file
-	    _writeMutex.lock();
-	    std::cout << result << std::endl;
-	    _writeMutex.unlock();
+	    if (!result.empty()) {
+	      _writeMutex.lock();
+	      std::cout << result << std::endl;
+	      _writeMutex.unlock();
+	    }
 
 	  }
 

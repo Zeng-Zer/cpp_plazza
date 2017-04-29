@@ -6,7 +6,7 @@
 #include "Scrapper.hpp"
 #include "Exception.hpp"
 
-Process::Process(int nbThread, std::shared_ptr<ICommunication> com)
+Process::Process(int nbThread, std::shared_ptr<ICommunication> const& com)
   : _nbThread(nbThread), _com(com), _running(true) {
   static auto handler = [this] (int sig) {
     if (sig != SIGTERM) {

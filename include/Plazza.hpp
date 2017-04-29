@@ -24,6 +24,7 @@ public:
    */
   void run();
 
+private:
   /**
    * create a new process
    */
@@ -55,16 +56,10 @@ public:
    */
   void processTask(Task const& task);
 
-private:
   /**
    * parse string to get the next tasks
    */
   std::vector<Task> readTask(std::string const& line) const;
-
-  /**
-   * kill the process
-   */
-  void killProcess(pid_t pid);
 
 private:
   int const _nbThread;

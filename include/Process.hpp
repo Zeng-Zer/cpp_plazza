@@ -16,7 +16,7 @@
  */
 class Process {
 public:
-  Process(int nbThread, std::shared_ptr<ICommunication> com);
+  Process(int nbThread, std::shared_ptr<ICommunication> const& com);
   ~Process();
 
   /**

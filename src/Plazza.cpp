@@ -27,6 +27,7 @@ Plazza::Plazza(int nbThread) : _nbThread(nbThread) {
   sa.sa_handler = [] (int sig) {
     handler(sig);
   };
+  sa.sa_flags = SA_RESTART;
 
   sigaction(SIGCHLD, &sa, NULL);
 }
@@ -52,7 +53,6 @@ void Plazza::run() {
     }
 
   }
-
 
   usleep(100000);
   killAll();
@@ -114,15 +114,8 @@ void Plazza::deleteProcess(pid_t pid) {
 
 void Plazza::killAll() {
   for (auto const& process : _processes) {
-    killProcess(process.first);
+    kill(process.first, SIGTERM);
   }
-}
-
-void Plazza::killProcess(pid_t pid) {
-  if (!_processes.count(pid)) {
-    return;
-  }
-  kill(pid, SIGTERM);
 }
 
 pid_t Plazza::getAvailableProcess() const {

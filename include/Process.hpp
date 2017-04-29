@@ -54,6 +54,7 @@ private:
   std::vector<std::thread> _threads;
   std::vector<bool> _thEmpty;
   std::mutex _mutex;
+  std::mutex _writeMutex;
   bool _running;
 };
 

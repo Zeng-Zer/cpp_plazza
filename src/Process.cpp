@@ -26,7 +26,11 @@ Process::~Process() {
 
 void Process::run() {
   for (int i = 0; i < _nbThread; ++i) {
-    createThread(i);
+    try {
+      createThread(i);
+    } catch (std::system_error const& e) {
+      std::cerr << e.what() << std::endl;
+    }
   }
 
   std::chrono::time_point<std::chrono::system_clock> start;
@@ -83,14 +87,20 @@ void Process::createThread(int id) {
 	  if (task) {
 	    _thEmpty[id] = false;
 
+	    // parse file
+	    std::vector<std::string> result;
 	    try {
-	      std::vector<std::string> result = scrapper.parseDocument(task->file, task->info);
-	      for (std::string const& str : result) {
-		std::cout << str << std::endl;
-	      }
+	      result = scrapper.parseDocument(task->file, task->info);
 	    } catch (FileException const& e) {
 	      std::cerr << e.what() << std::endl;
 	    }
+
+	    // write the file
+	    _writeMutex.lock();
+	    for (std::string const& str : result) {
+	      std::cout << str << std::endl;
+	    }
+	    _writeMutex.unlock();
 
 	  }
 

@@ -54,6 +54,7 @@ void Plazza::run() {
   }
 
 
+  usleep(100000);
   killAll();
   usleep(100000);
 }
@@ -67,7 +68,6 @@ void Plazza::processTask(Task const& task) {
       std::cerr << e.what() << std::endl;
     }
   }
-  std::cout << "process pid: " << pid << std::endl;
 
   sendTask(pid, task);
 }
@@ -76,7 +76,6 @@ pid_t Plazza::createProcess() {
   std::shared_ptr<ICommunication> com(new Communication(_processes.size() * 2));
   int nb = _nbThread;
 
-  std::cout << "NEW PROCESS" << std::endl;
   // child process here
   Fork process([&com, nb] () {
       com->openCommunicationChild();
@@ -96,12 +95,8 @@ pid_t Plazza::createProcess() {
 
 void Plazza::sendTask(pid_t process, Task const& task) const {
   std::shared_ptr<ICommunication> com = _processes.at(process);
-  Package pkg;
+  Package pkg = {TASK, .content = { .task = task }};
 
-  bzero(&pkg, sizeof(Package));
-
-  pkg.type = TASK;
-  pkg.content.task = task;
   com->sendMsg(pkg);
 }
 
@@ -109,8 +104,6 @@ void Plazza::deleteProcess(pid_t pid) {
   if (!_processes.count(pid)) {
     return;
   }
-
-  std::cout << "delete process" << std::endl;
 
   std::shared_ptr<ICommunication> com = _processes[pid];
 
@@ -144,7 +137,6 @@ pid_t Plazza::getAvailableProcess() const {
       res = com->receiveMsg();
     }
     if (res.type == OCCUPIED_SLOT && res.content.value < _nbThread *2) {
-      std::cout << "OLD PROCESS: Got process: size available: " << res.content.value << std::endl;
       return pid;
     }
   }
@@ -177,6 +169,7 @@ std::vector<Task> Plazza::readTask(std::string const& line) const {
   std::vector<Task> tasks;
   for (std::string const& file : tokens) {
     Task task;
+    bzero(&task, sizeof(Task));
     task.info = info;
     strcpy(task.file, file.c_str());
     tasks.push_back(task);

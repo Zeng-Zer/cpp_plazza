@@ -30,11 +30,6 @@ public:
   pid_t createProcess();
 
   /**
-   * send a package to the process
-   */
-  void sendPkg(pid_t process, Package pkg) const;
-
-  /**
    * send task to a process
    */
   void sendTask(pid_t process, Task const& task) const;
@@ -73,7 +68,7 @@ private:
 
 private:
   int const _nbThread;
-  std::map<pid_t, std::unique_ptr<ICommunication>> _processes;
+  std::map<pid_t, std::shared_ptr<ICommunication>> _processes;
 };
 
 #endif /* !PLAZZA_HPP_ */

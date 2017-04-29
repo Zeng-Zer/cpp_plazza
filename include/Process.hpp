@@ -16,7 +16,7 @@
  */
 class Process {
 public:
-  Process(int nbThread, std::unique_ptr<ICommunication> const& com);
+  Process(int nbThread, std::shared_ptr<ICommunication> com);
   ~Process();
 
   /**
@@ -49,7 +49,7 @@ private:
 
 private:
   int const _nbThread;
-  std::unique_ptr<ICommunication> const& _com;
+  std::shared_ptr<ICommunication> _com;
   BlockingQueue<Task> _tasks;
   std::vector<std::thread> _threads;
   std::vector<bool> _thEmpty;

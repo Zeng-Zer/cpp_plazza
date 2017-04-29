@@ -67,15 +67,16 @@ void Plazza::processTask(Task const& task) {
       std::cerr << e.what() << std::endl;
     }
   }
+  std::cout << "process pid: " << pid << std::endl;
 
-  usleep(100000);
   sendTask(pid, task);
 }
 
 pid_t Plazza::createProcess() {
-  std::unique_ptr<ICommunication> com(new Communication(_processes.size() * 2));
+  std::shared_ptr<ICommunication> com(new Communication(_processes.size() * 2));
   int nb = _nbThread;
 
+  std::cout << "NEW PROCESS" << std::endl;
   // child process here
   Fork process([&com, nb] () {
       com->openCommunicationChild();
@@ -93,15 +94,15 @@ pid_t Plazza::createProcess() {
   }
 }
 
-void Plazza::sendPkg(pid_t process, Package pkg) const {
-  std::unique_ptr<ICommunication> const& com = _processes.at(process);
-  com->sendMsg(pkg);
-}
-
 void Plazza::sendTask(pid_t process, Task const& task) const {
-  Package pkg = {TASK, .content = {.task = task}};
+  std::shared_ptr<ICommunication> com = _processes.at(process);
+  Package pkg;
 
-  sendPkg(process, pkg);
+  bzero(&pkg, sizeof(Package));
+
+  pkg.type = TASK;
+  pkg.content.task = task;
+  com->sendMsg(pkg);
 }
 
 void Plazza::deleteProcess(pid_t pid) {
@@ -109,7 +110,9 @@ void Plazza::deleteProcess(pid_t pid) {
     return;
   }
 
-  std::unique_ptr<ICommunication> com = std::move(_processes[pid]);
+  std::cout << "delete process" << std::endl;
+
+  std::shared_ptr<ICommunication> com = _processes[pid];
 
   _processes.erase(_processes.find(pid));
   com->close();
@@ -126,14 +129,7 @@ void Plazza::killProcess(pid_t pid) {
   if (!_processes.count(pid)) {
     return;
   }
-
   kill(pid, SIGTERM);
-
-  std::unique_ptr<ICommunication> com = std::move(_processes[pid]);
-
-  _processes.erase(_processes.find(pid));
-  com->close();
-  com->rmfifo();
 }
 
 pid_t Plazza::getAvailableProcess() const {
@@ -148,6 +144,7 @@ pid_t Plazza::getAvailableProcess() const {
       res = com->receiveMsg();
     }
     if (res.type == OCCUPIED_SLOT && res.content.value < _nbThread *2) {
+      std::cout << "OLD PROCESS: Got process: size available: " << res.content.value << std::endl;
       return pid;
     }
   }

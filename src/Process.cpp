@@ -6,7 +6,7 @@
 #include "Scrapper.hpp"
 #include "Exception.hpp"
 
-Process::Process(int nbThread, std::unique_ptr<ICommunication> const& com)
+Process::Process(int nbThread, std::shared_ptr<ICommunication> com)
   : _nbThread(nbThread), _com(com), _running(true) {
   static auto handler = [this] (int sig) {
     if (sig != SIGTERM) {
@@ -61,7 +61,6 @@ void Process::handleMsg() {
 	++pkg.content.value;
       }
     }
-    usleep(100000);
     _com->sendMsg(pkg);
     break;
   case TASK:

@@ -15,7 +15,7 @@ enum Information {
  * Structure defining a task to be sent to processes
  */
 struct Task {
-  char file[256];
+  char file[512];
   Information info;
 };
 

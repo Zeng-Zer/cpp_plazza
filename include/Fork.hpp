@@ -9,6 +9,9 @@ public:
   Fork(std::function<void()>f);
   ~Fork();
 
+  /**
+   * return pid
+   */
   pid_t getPid() const;
 
 private:

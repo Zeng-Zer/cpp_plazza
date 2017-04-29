@@ -2,6 +2,9 @@
 #include "Utils.hpp"
 #include "Plazza.hpp"
 #include "Exception.hpp"
+#ifdef UI
+# include "UI.hpp"
+#endif
 
 static int getParamThread(int argc, char *argv[]) {
   if (argc != 2) {
@@ -29,6 +32,13 @@ int main(int argc, char *argv[]) {
     return -1;
   }
 
+  #ifdef UI
+  UI gui;
+  gui.create();
+  gui.update();
+  std::cout << "azefzepofkazoazkpodakpo" << std::endl;
+  #endif
+  std::cout << "azerty" << std::endl;
   Plazza plazza(nbThread);
   plazza.run();
 

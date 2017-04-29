@@ -1,5 +1,7 @@
 #include "Communication.hpp"
 
+#include <string.h>
+
 Communication::Communication(int id)
   : _id(id)
 {
@@ -59,7 +61,7 @@ Package Communication::receiveMsg()
       msg.type = UNDEFINED;
       msg.content.value = -1;
     }
-  return (msg);
+  return msg;
 }
 
 void Communication::close()
@@ -76,3 +78,4 @@ void Communication::rmfifo()
   unlink(oPath.c_str());
   unlink(iPath.c_str());
 }
+

@@ -125,7 +125,8 @@ pid_t Plazza::getAvailableProcess() const {
     auto const& com = process.second;
 
     com->sendMsg(pkg);
-    Package res = com->receiveMsg();
+    Package res;
+    *com >> res;
     while (res.type == UNDEFINED) {
       res = com->receiveMsg();
     }

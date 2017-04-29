@@ -22,6 +22,7 @@ public:
   Package receiveMsg() override;
   void close() override;
   void rmfifo() override;
+
 private:
   int _id;
   int _fdOutputPipe;

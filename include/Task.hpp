@@ -5,6 +5,8 @@
 # include <string>
 # include <map>
 
+class ICommunication;
+
 enum Information {
   PHONE_NUMBER,
   EMAIL_ADDRESS,
@@ -45,5 +47,8 @@ struct Package {
     long value;
   } content;
 };
+
+ICommunication& operator<<(ICommunication&, const Package&);
+ICommunication& operator>>(ICommunication&, Package&);
 
 #endif /* !TASK_HPP_ */

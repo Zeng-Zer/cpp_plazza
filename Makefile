@@ -22,10 +22,16 @@ SRC :=		main.cpp \
 		Exception.cpp \
 		Communication.cpp \
 
+SRCUI :=	Ui.cpp \
+
 CXX :=		g++
 CXXFLAGS :=	-W -Wall -Wextra -g -std=c++14 -pthread
+UIFLAGS :=	-DUI -lsfml-graphics -lsfml-window -lsfml-system
 SRC :=		$(addprefix $(SRCDIR), $(SRC))
+SRCUI :=		$(addprefix $(SRCDIR), $(SRCUI))
+
 OBJ :=		$(SRC:.cpp=.o)
+OBJUI :=	$(SRCUI:.cpp=.o)
 RM :=		rm -f
 
 DEFAULT :=	"\033[00;0m"
@@ -37,6 +43,13 @@ all: $(NAME)
 
 $(NAME): $(OBJ)
 	$(CXX) -o $(NAME) $(OBJ) $(CXXFLAGS) && \
+		echo -e $(GREEN)"[BIN]"$(CYAN) $(NAME)$(DEFAULT) || \
+		echo -e $(RED)"[XX]"$(DEFAULT) $(NAME)
+	for file in $(shell find . | cut -c 3- | grep -P ".*\.(cpp|hpp|c|h)"); \
+		do fgrep -niH -e TODO -e FIXME $$file --color=auto; done; true
+
+ui: $(OBJ) $(OBJUI)
+	$(CXX) -o $(NAME) $(OBJ) $(OBJUI) $(UIFLAGS) $(CXXFLAGS) && \
 		echo -e $(GREEN)"[BIN]"$(CYAN) $(NAME)$(DEFAULT) || \
 		echo -e $(RED)"[XX]"$(DEFAULT) $(NAME)
 	for file in $(shell find . | cut -c 3- | grep -P ".*\.(cpp|hpp|c|h)"); \
@@ -54,7 +67,7 @@ re: fclean all
 
 .PHONY: all clean fclean re
 
-.SILENT: all $(NAME) clean fclean re
+.SILENT: all $(NAME) ui clean fclean re
 
 %.o: %.cpp
 	@$(CXX) -c $< -o $@ $(CXXFLAGS) $(foreach dir, $(INCLUDE), -I$(dir)) && \

@@ -23,12 +23,14 @@ SRC :=		main.cpp \
 		Communication.cpp \
 
 SRCUI :=	Ui.cpp \
+		$(SRC)
 
 CXX :=		g++
 CXXFLAGS :=	-W -Wall -Wextra -g -std=c++14 -pthread
-UIFLAGS :=	-DUI -lsfml-graphics -lsfml-window -lsfml-system
+CXXFLAGS_UI :=	$(CXXFLAGS) -DUI -Iinclude/ -lsfml-graphics -lsfml-window -lsfml-system -lm
+
 SRC :=		$(addprefix $(SRCDIR), $(SRC))
-SRCUI :=		$(addprefix $(SRCDIR), $(SRCUI))
+SRCUI :=	$(addprefix $(SRCDIR), $(SRCUI))
 
 OBJ :=		$(SRC:.cpp=.o)
 OBJUI :=	$(SRCUI:.cpp=.o)
@@ -48,8 +50,8 @@ $(NAME): $(OBJ)
 	for file in $(shell find . | cut -c 3- | grep -P ".*\.(cpp|hpp|c|h)"); \
 		do fgrep -niH -e TODO -e FIXME $$file --color=auto; done; true
 
-ui: $(OBJ) $(OBJUI)
-	$(CXX) -o $(NAME) $(OBJ) $(OBJUI) $(UIFLAGS) $(CXXFLAGS) && \
+ui:
+	$(CXX) -o $(NAME) $(SRCUI) $(CXXFLAGS_UI) && \
 		echo -e $(GREEN)"[BIN]"$(CYAN) $(NAME)$(DEFAULT) || \
 		echo -e $(RED)"[XX]"$(DEFAULT) $(NAME)
 	for file in $(shell find . | cut -c 3- | grep -P ".*\.(cpp|hpp|c|h)"); \
@@ -57,7 +59,7 @@ ui: $(OBJ) $(OBJUI)
 
 clean:
 	echo -e $(CYAN)"Cleaning $(NAME) tmp files..." $(DEFAULT)
-	$(RM) $(OBJ)
+	$(RM) $(OBJ) $(OBJUI)
 
 fclean:	clean
 	echo -e $(CYAN)"Cleaning $(NAME) executable..." $(DEFAULT)

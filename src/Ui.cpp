@@ -13,7 +13,7 @@ Ui::~Ui()
 void Ui::create()
 {
   _window.create(sf::VideoMode(800, 600), "plazza", sf::Style::None);
-  _window.clear(sf::Color::Blue);
+  _window.clear(sf::Color::Black);
   _modified = true;
   std::cout << "yoloswag" << std::endl;
 }

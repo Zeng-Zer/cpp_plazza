@@ -3,7 +3,7 @@
 #include "Plazza.hpp"
 #include "Exception.hpp"
 #ifdef UI
-# include "UI.hpp"
+# include "Ui.hpp"
 #endif
 
 static int getParamThread(int argc, char *argv[]) {
@@ -33,7 +33,7 @@ int main(int argc, char *argv[]) {
   }
 
   #ifdef UI
-  UI gui;
+  Ui gui;
   gui.create();
   gui.update();
   std::cout << "azefzepofkazoazkpodakpo" << std::endl;

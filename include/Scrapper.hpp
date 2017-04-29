@@ -17,7 +17,7 @@ public:
   /**
    * parse a file to retrieve data
    */
-  std::vector<std::string> parseDocument(std::string const& file, Information info);
+  std::string parseDocument(std::string const& file, Information info) const;
 
 private:
 

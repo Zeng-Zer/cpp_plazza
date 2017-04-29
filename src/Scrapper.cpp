@@ -14,11 +14,10 @@ Scrapper::~Scrapper() {
 
 }
 
-std::vector<std::string>  Scrapper::parseDocument(std::string const& file, Information info) {
+std::string Scrapper::parseDocument(std::string const& file, Information info) const {
   std::smatch m;
-  std::string myFileContent;
-  std::regex email("[-\\w.]+.[-\\w.]+@[-\\w.]+.[\\w]+");
-  std::regex ip("^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$");
+  std::regex email("[a-zA-Z0-9_.-]+@[a-zA-Z0-9_.-]+");
+  std::regex ip("(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])");
   std::regex number("0[0-9](\\s[0-9][0-9]){4}|0[0-9]([0-9]){8}");
 
   std::ifstream myFile(file);
@@ -26,32 +25,25 @@ std::vector<std::string>  Scrapper::parseDocument(std::string const& file, Infor
     throw FileException("File failed to open: " + file);
   }
 
-  std::vector<std::string> result;
-  while (getline(myFile, myFileContent)) {
+  std::string content((std::istreambuf_iterator<char>(myFile)),
+		      std::istreambuf_iterator<char>());
 
-    switch (info) {
-
-    case IP_ADDRESS:
-      if (std::regex_search(myFileContent, m, ip)) {
-	result.push_back(m[0]);
-      }
-      break;
-
-    case EMAIL_ADDRESS:
-      if (std::regex_search(myFileContent, m, email)) {
-	result.push_back(m[0]);
-      }
-      break;
-
-    case PHONE_NUMBER:
-      if (std::regex_search(myFileContent, m, number)) {
-	result.push_back(m[0]);
-      }
-      break;
-
+  switch (info) {
+  case IP_ADDRESS:
+    if (std::regex_search(content, m, ip)) {
+      return m[0];
     }
 
+  case EMAIL_ADDRESS:
+    if (std::regex_search(content, m, email)) {
+      return m[0];
+    }
+
+  case PHONE_NUMBER:
+    if (std::regex_search(content, m, number)) {
+      return m[0];
+    }
   }
-  myFile.close();
-  return result;
+
+  return "";
 }

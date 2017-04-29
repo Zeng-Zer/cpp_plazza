@@ -10,7 +10,7 @@
 #include "Exception.hpp"
 #include "Communication.hpp"
 
-Plazza::Plazza(int nbThread) : _nbThread(nbThread) {
+Plazza::Plazza(int nbThread) : _nbThread(nbThread), _threadId(0) {
   // handle child death
   static auto handler = [this] (int) {
     pid_t pid;
@@ -73,7 +73,7 @@ void Plazza::processTask(Task const& task) {
 }
 
 pid_t Plazza::createProcess() {
-  std::shared_ptr<ICommunication> com(new Communication(_processes.size() * 2));
+  std::shared_ptr<ICommunication> com(new Communication(_threadId++ * 2));
   int nb = _nbThread;
 
   // child process here
@@ -146,6 +146,7 @@ std::vector<Task> Plazza::readTask(std::string const& line) const {
   }
 
   if (tokens.size() <= 1) {
+    std::cerr << "Missing information or file" << std::endl;
     return {};
   }
 

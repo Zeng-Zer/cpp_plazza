@@ -64,6 +64,7 @@ private:
 private:
   int const _nbThread;
   std::map<pid_t, std::shared_ptr<ICommunication>> _processes;
+  long _threadId;
 };
 
 #endif /* !PLAZZA_HPP_ */

@@ -88,7 +88,7 @@ void Process::createThread(int id) {
 	    _thEmpty[id] = false;
 
 	    // parse file
-	    std::vector<std::string> result;
+	    std::string result;
 	    try {
 	      result = scrapper.parseDocument(task->file, task->info);
 	    } catch (FileException const& e) {
@@ -97,9 +97,7 @@ void Process::createThread(int id) {
 
 	    // write the file
 	    _writeMutex.lock();
-	    for (std::string const& str : result) {
-	      std::cout << str << std::endl;
-	    }
+	    std::cout << result << std::endl;
 	    _writeMutex.unlock();
 
 	  }

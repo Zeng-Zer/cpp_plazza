@@ -8,13 +8,11 @@
 
 Process::Process(int nbThread, std::unique_ptr<ICommunication> const& com)
   : _nbThread(nbThread), _com(com), _running(true) {
-  std::cout << "pid: " << getpid() << std::endl;
   static auto handler = [this] (int sig) {
     if (sig != SIGTERM) {
       return;
     }
 
-    std::cout << "stopping" << std::endl;
     stop();
   };
 
@@ -63,12 +61,10 @@ void Process::handleMsg() {
 	++pkg.content.value;
       }
     }
-    std::cout << "size: " << pkg.content.value << std::endl;
     usleep(100000);
     _com->sendMsg(pkg);
     break;
   case TASK:
-    std::cout << "th got: " << pkg.content.task.file << std::endl;
     _tasks.push(pkg.content.task);
     break;
   default:
@@ -84,7 +80,7 @@ void Process::createThread(int id) {
 	while (_running) {
 	  _thEmpty[id] = true;
 
-	  Option<Task> task = _tasks.timedPop(100);
+	  Option<Task> task = _tasks.timedPop(1000);
 	  if (task) {
 	    _thEmpty[id] = false;
 
@@ -111,8 +107,6 @@ void Process::stop() {
   for (std::thread& th : _threads) {
     th.join();
   }
-
-  std::cout << "stopped process" << std::endl;
 
   exit(0);
 }

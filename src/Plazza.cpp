@@ -56,7 +56,6 @@ void Plazza::run() {
 
   killAll();
   usleep(100000);
-  std::cout << "end" << std::endl;
 }
 
 void Plazza::processTask(Task const& task) {
@@ -74,7 +73,6 @@ void Plazza::processTask(Task const& task) {
 }
 
 pid_t Plazza::createProcess() {
-  std::cout << "new process, id: " << _processes.size() * 2 << std::endl;
   std::unique_ptr<ICommunication> com(new Communication(_processes.size() * 2));
   int nb = _nbThread;
 
@@ -120,7 +118,6 @@ void Plazza::deleteProcess(pid_t pid) {
 
 void Plazza::killAll() {
   for (auto const& process : _processes) {
-    std::cout << "killing " << process.first << std::endl;
     killProcess(process.first);
   }
 }
@@ -151,7 +148,6 @@ pid_t Plazza::getAvailableProcess() const {
       res = com->receiveMsg();
     }
     if (res.type == OCCUPIED_SLOT && res.content.value < _nbThread *2) {
-      std::cout << "got this pid: " << pid << ", used slot: " << res.content.value << std::endl;
       return pid;
     }
   }

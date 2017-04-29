@@ -10,9 +10,14 @@ class ICommunication {
 public:
   virtual ~ICommunication() {}
 
-  // TODO Method to communicate between plazza and process
-
+  /**
+   * Open main communication
+   */
   virtual void openCommunicationMain() = 0;
+
+  /**
+   * Open child communication
+   */
   virtual void openCommunicationChild() = 0;
 
   /**
@@ -29,6 +34,10 @@ public:
    * close the communication
    */
   virtual void close() = 0;
+
+  /**
+   * clean fifo
+   */
   virtual void rmfifo() = 0;
 };
 

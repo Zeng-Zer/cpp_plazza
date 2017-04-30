@@ -24,6 +24,11 @@ public:
    */
   void run();
 
+  /**
+   * get processes status
+   */
+  std::vector<int> getProcessesStatus();
+
 private:
   /**
    * create a new process
@@ -44,11 +49,6 @@ private:
    * kill every process
    */
   void killAll();
-
-  /**
-   * get processes status
-   */
-  std::vector<int> getProcessesStatus();
 
   /**
    * get a process that is available to work

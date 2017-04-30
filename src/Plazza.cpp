@@ -10,18 +10,21 @@
 #include "Exception.hpp"
 #include "Communication.hpp"
 
+static std::shared_ptr<ICommunication> *g_ptr;
+
 Plazza::Plazza(int nbThread) : _nbThread(nbThread), _threadId(0), _stopped(false) {
   // handle child death
-  static auto handler = [this] (int) {
+  static auto handler = [this] (int sig) {
     pid_t pid;
     int status;
 
-    // lock();
     while ((pid = waitpid(-1, &status, WNOHANG)) != -1) {
       std::cout << "process deleted" << std::endl;
       deleteProcess(pid);
     }
-    // unlock();
+    if (sig == SIGABRT || sig == SIGSEGV) {
+      *g_ptr = std::shared_ptr<ICommunication>(nullptr);
+    }
   };
 
   struct sigaction sa;
@@ -33,6 +36,8 @@ Plazza::Plazza(int nbThread) : _nbThread(nbThread), _threadId(0), _stopped(false
   sa.sa_flags = SA_RESTART;
 
   sigaction(SIGCHLD, &sa, NULL);
+  sigaction(SIGSEGV, &sa, NULL);
+  sigaction(SIGABRT, &sa, NULL);
 }
 
 Plazza::~Plazza() {
@@ -145,12 +150,16 @@ std::vector<std::pair<int, pid_t>> Plazza::getProcessesStatus() {
   std::vector<std::pair<int, pid_t>> ret;
   for (auto const& process : _processes) {
     Package pkg = {OCCUPIED_SLOT, .content = {.value = -1}};
-    auto const& com = process.second;
+    std::shared_ptr<ICommunication> com = process.second;
 
     _interacting.lock();
     com->sendMsg(pkg);
+    g_ptr = &com;
     Package res = com->receiveMsg();
     while (res.type == UNDEFINED && !_stopped) {
+      if (!com) {
+	return ret;
+      }
       res = com->receiveMsg();
     }
     _interacting.unlock();

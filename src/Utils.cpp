@@ -1,3 +1,6 @@
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 #include "Utils.hpp"
 
 Option<int> Utils::getOptNumber(std::string const& str) {
@@ -27,4 +30,11 @@ std::string Utils::trim(std::string str) {
     str = "";
   }
   return str;
+}
+
+bool Utils::isDirectory(std::string const& file) {
+  struct stat path_stat;
+
+  stat(file.c_str(), &path_stat);
+  return !S_ISREG(path_stat.st_mode);
 }

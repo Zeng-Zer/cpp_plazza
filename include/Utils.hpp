@@ -9,6 +9,7 @@
 namespace Utils {
   Option<int> getOptNumber(std::string const& str);
   std::string trim(std::string str);
+  bool isDirectory(std::string const& file);
 }
 
 #endif /* !UTILS_HPP_ */

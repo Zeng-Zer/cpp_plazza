@@ -5,6 +5,7 @@
 #include <sstream>
 #include "Scrapper.hpp"
 #include "Exception.hpp"
+#include "Utils.hpp"
 
 Scrapper::Scrapper() {
 
@@ -20,7 +21,11 @@ std::string Scrapper::parseDocument(std::string const& file, Information info) c
   std::regex ip("(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])");
   std::regex number("0[0-9](\\s[0-9][0-9]){4}|0[0-9]([0-9]){8}");
 
-  std::ifstream myFile(file);
+  if (Utils::isDirectory(file)) {
+    throw FileException(file + " is a directory");
+  }
+
+  std::ifstream myFile(file, std::ifstream::binary);
   if (!myFile.is_open()) {
     throw FileException("File failed to open: " + file);
   }

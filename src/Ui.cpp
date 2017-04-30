@@ -51,14 +51,17 @@ void Ui::drawProcess()
   unsigned j = 0;
   unsigned index = 0;
   unsigned nbSquare = _process.size();
-  // std::cout << nbSquare << std::endl;
-  unsigned nbSquareLine = std::log2(nbSquare) + 2;
-  unsigned squareSize = _width / (log2(nbSquare) + 2);
-  // std::cout << "Size : " << squareSize << std::endl;
+  // std::cout << "nbSquare : " << nbSquare << std::endl;
+  unsigned nbSquareLine = std::sqrt(nbSquare - 1) + 1;
+  // unsigned nbSquareLine = std::log2(nbSquare - ((nbSquare == 1) ? 0 : 1)) + 2;
+  unsigned squareSize = _width / (std::sqrt(nbSquare - 1) + 1);
+  // std::cout << "nbSquareLine : " << nbSquareLine << std::endl;
+  // std::cout << "Size : " << squareSize << std::endl << std::endl;
 
   while (j < nbSquareLine)
     {
       i = 0;
+      x = 0;
       while (i < nbSquareLine && index < nbSquare)
 	{
 	  drawRect(x + 10, y + 10, squareSize - 20, squareSize - 20, sf::Color::Blue);
@@ -80,14 +83,17 @@ void Ui::drawThreads(const unsigned nbThreadUsed, const unsigned xP, const unsig
   unsigned j = 0;
   unsigned index = 0;
   unsigned nbSquare = _nbThread;
-  // std::cout << nbSquare << std::endl;
-  unsigned nbSquareLine = std::log2(nbSquare) + 2;
-  unsigned squareSize = sizeP / (log2(nbSquare) + 2);
-  // std::cout << "Size : " << squareSize << std::endl;
+  std::cout << "SizeP : " << sizeP << std::endl;
+  std::cout << "nbSquare : " << nbSquare << std::endl;
+  unsigned nbSquareLine = std::sqrt(nbSquare - 1) + 1;
+  unsigned squareSize = sizeP / (std::sqrt(nbSquare - 1) + 1);
+  std::cout << "nbSquareLine : " << nbSquareLine << std::endl;
+  std::cout << "Size : " << squareSize << std::endl << std::endl;
 
   while (j < nbSquareLine)
     {
       i = 0;
+      x = xP;
       while (i < nbSquareLine && index < nbSquare)
 	{
 	  drawRect(x + 10, y + 10, squareSize - 20, squareSize - 20, (index < nbThreadUsed) ? sf::Color::Green : sf::Color::Red);

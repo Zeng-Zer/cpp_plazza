@@ -3,6 +3,7 @@
 
 # include <string>
 # include <vector>
+# include <regex>
 # include "Task.hpp"
 
 /**
@@ -17,10 +18,23 @@ public:
   /**
    * parse a file to retrieve data
    */
-  std::string parseDocument(std::string const& file, Information info) const;
+  std::vector<std::string> parseDocument(std::string const& file, Information info) const;
+
+  /**
+   * match content with corresponding regex
+   */
+  std::vector<std::string> matchContent(std::string content, Information info) const;
+
+  /**
+   * decifer caesar
+   */
+  std::vector<std::string> caesar(std::string content, Information info) const;
 
 private:
-
+  static std::regex const _email;
+  static std::regex const _ip;
+  static std::regex const _number;
+  static std::map<Information, std::regex> const _regex;
 };
 
 #endif /* !SCRAPPER_HPP_ */

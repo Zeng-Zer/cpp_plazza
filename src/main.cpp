@@ -49,7 +49,9 @@ int main(int argc, char *argv[]) {
 	for (int i : status) {
 	  std::cout << "process: " << i << ", nb of thread working: " << i << "/" << nbThread * 2 << std::endl;
 	}
-
+	usleep(1000);
+	gui.setProcessList(status);
+	gui.drawProcess();
 	gui.update();
       }
 

@@ -25,7 +25,7 @@ SRC :=		main.cpp \
 SRCUI :=	Ui.cpp \
 		$(SRC)
 
-CXX :=		g++
+CXX :=		clang++
 CXXFLAGS :=	-W -Wall -Wextra -g -std=c++14 -pthread
 CXXFLAGS_UI :=	$(CXXFLAGS) -DUI -Iinclude/ -lsfml-graphics -lsfml-window -lsfml-system -lm
 

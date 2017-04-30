@@ -10,7 +10,7 @@
 #include "Exception.hpp"
 #include "Communication.hpp"
 
-Plazza::Plazza(int nbThread) : _nbThread(nbThread), _threadId(0) {
+Plazza::Plazza(int nbThread) : _nbThread(nbThread), _threadId(0), _stopped(false) {
   // handle child death
   static auto handler = [this] (int) {
     pid_t pid;
@@ -57,6 +57,10 @@ void Plazza::run() {
   usleep(100000);
   killAll();
   usleep(100000);
+}
+
+bool Plazza::stopped() const {
+  return _stopped;
 }
 
 void Plazza::processTask(Task const& task) {
@@ -113,6 +117,7 @@ void Plazza::deleteProcess(pid_t pid) {
 }
 
 void Plazza::killAll() {
+  _stopped = true;
   for (auto const& process : _processes) {
     kill(process.first, SIGTERM);
   }
@@ -125,9 +130,17 @@ std::vector<int> Plazza::getProcessesStatus() {
     auto const& com = process.second;
 
     _interacting.lock();
+    if (_stopped) {
+      _interacting.unlock();
+      return {};
+    }
     com->sendMsg(pkg);
+    if (_stopped) {
+      _interacting.unlock();
+      return {};
+    }
     Package res = com->receiveMsg();
-    while (res.type == UNDEFINED) {
+    while (res.type == UNDEFINED && !_stopped) {
       res = com->receiveMsg();
     }
     _interacting.unlock();

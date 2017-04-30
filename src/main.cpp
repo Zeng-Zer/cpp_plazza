@@ -32,15 +32,34 @@ int main(int argc, char *argv[]) {
     return -1;
   }
 
-  #ifdef UI
-  Ui gui;
-  gui.create();
-  gui.update();
-  std::cout << "azefzepofkazoazkpodakpo" << std::endl;
-  #endif
-  std::cout << "azerty" << std::endl;
   Plazza plazza(nbThread);
+
+#ifdef UI
+  std::thread th([&plazza, nbThread] () {
+      Ui gui;
+      gui.create();
+
+      // main loop
+      while (1) {
+	std::vector<int> status = plazza.getProcessesStatus();
+	if (plazza.stopped()) {
+	  return;
+	}
+
+	for (int i : status) {
+	  std::cout << "process: " << i << ", nb of thread working: " << i << "/" << nbThread * 2 << std::endl;
+	}
+
+	gui.update();
+      }
+
+    });
+#endif
+
   plazza.run();
+#ifdef UI
+  th.join();
+#endif
 
   return 0;
 }

@@ -25,6 +25,11 @@ public:
   void run();
 
   /**
+   * getter for _stopped
+   */
+  bool stopped() const;
+
+  /**
    * get processes status
    */
   std::vector<int> getProcessesStatus();
@@ -71,6 +76,7 @@ private:
   std::map<pid_t, std::shared_ptr<ICommunication>> _processes;
   long _threadId;
   std::mutex _interacting;
+  bool _stopped;
 };
 
 #endif /* !PLAZZA_HPP_ */

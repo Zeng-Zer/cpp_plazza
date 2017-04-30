@@ -46,10 +46,15 @@ private:
   void killAll();
 
   /**
+   * get processes status
+   */
+  std::vector<int> getProcessesStatus();
+
+  /**
    * get a process that is available to work
    * return -1 if there isn't any available process
    */
-  pid_t getAvailableProcess() const;
+  pid_t getAvailableProcess();
 
   /**
    * process task
@@ -65,6 +70,7 @@ private:
   int const _nbThread;
   std::map<pid_t, std::shared_ptr<ICommunication>> _processes;
   long _threadId;
+  std::mutex _interacting;
 };
 
 #endif /* !PLAZZA_HPP_ */

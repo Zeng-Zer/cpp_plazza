@@ -57,6 +57,8 @@ void Plazza::run() {
   usleep(100000);
   killAll();
   usleep(100000);
+  while (!_processes.empty());
+  _stopped = true;
 }
 
 bool Plazza::stopped() const {
@@ -117,7 +119,6 @@ void Plazza::deleteProcess(pid_t pid) {
 }
 
 void Plazza::killAll() {
-  _stopped = true;
   for (auto const& process : _processes) {
     kill(process.first, SIGTERM);
   }

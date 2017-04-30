@@ -42,6 +42,7 @@ int main(int argc, char *argv[]) {
       // main loop
       while (1) {
 	std::vector<int> status = plazza.getProcessesStatus();
+
 	if (plazza.stopped()) {
 	  return;
 	}

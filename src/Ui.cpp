@@ -57,7 +57,7 @@ void Ui::drawProcess()
   unsigned squareSize = _width / (std::sqrt(nbSquare - 1) + 1);
   // std::cout << "nbSquareLine : " << nbSquareLine << std::endl;
   // std::cout << "Size : " << squareSize << std::endl << std::endl;
-
+  _window.clear(sf::Color::Black);
   while (j < nbSquareLine)
     {
       i = 0;

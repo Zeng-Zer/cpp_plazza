@@ -2,8 +2,8 @@
 
 #include <iostream>
 
-Ui::Ui()
-  : _width(1000), _height(1000)
+Ui::Ui(unsigned nbThread)
+  : _width(1000), _height(1000), _nbThread(nbThread)
 {
 }
 
@@ -25,7 +25,7 @@ void Ui::update(void)
   _modified = false;
 }
 
-void Ui::drawRect(const size_t& x, const size_t& y, const size_t& width, const size_t& height, const sf::Color color, const bool& fill)
+void Ui::drawRect(const unsigned& x, const unsigned& y, const size_t& width, const size_t& height, const sf::Color color, const bool& fill)
 {
   sf::RectangleShape rect(sf::Vector2f(width, height));
   rect.setPosition(x, y);
@@ -48,17 +48,55 @@ void Ui::drawProcess()
   unsigned x = 0;
   unsigned y = 0;
   unsigned i = 0;
+  unsigned j = 0;
+  unsigned index = 0;
   unsigned nbSquare = _process.size();
-  std::cout << nbSquare << std::endl;
+  // std::cout << nbSquare << std::endl;
   unsigned nbSquareLine = std::log2(nbSquare) + 2;
   unsigned squareSize = _width / (log2(nbSquare) + 2);
-  std::cout << "Size : " << squareSize << std::endl;
+  // std::cout << "Size : " << squareSize << std::endl;
 
-  while (i < nbSquareLine && i < nbSquare)
+  while (j < nbSquareLine)
     {
-      drawRect(x + 10, y + 10, squareSize - 20, squareSize - 20, sf::Color::Blue);
-      x += squareSize;
-      i++;
+      i = 0;
+      while (i < nbSquareLine && index < nbSquare)
+	{
+	  drawRect(x + 10, y + 10, squareSize - 20, squareSize - 20, sf::Color::Blue);
+	  drawThreads(_process[index], x + 10, y + 10, squareSize - 20);
+	  x += squareSize;
+	  i++;
+	  index++;
+	}
+      y += squareSize;
+      j++;
+    }
+}
+
+void Ui::drawThreads(const unsigned nbThreadUsed, const unsigned xP, const unsigned yP, const size_t sizeP)
+{
+  unsigned x = xP;
+  unsigned y = yP;
+  unsigned i = 0;
+  unsigned j = 0;
+  unsigned index = 0;
+  unsigned nbSquare = _nbThread;
+  // std::cout << nbSquare << std::endl;
+  unsigned nbSquareLine = std::log2(nbSquare) + 2;
+  unsigned squareSize = sizeP / (log2(nbSquare) + 2);
+  // std::cout << "Size : " << squareSize << std::endl;
+
+  while (j < nbSquareLine)
+    {
+      i = 0;
+      while (i < nbSquareLine && index < nbSquare)
+	{
+	  drawRect(x + 10, y + 10, squareSize - 20, squareSize - 20, (index < nbThreadUsed) ? sf::Color::Green : sf::Color::Red);
+	  x += squareSize;
+	  i++;
+	  index++;
+	}
+      y += squareSize;
+      j++;
     }
 }
 

@@ -36,7 +36,7 @@ int main(int argc, char *argv[]) {
 
 #ifdef UI
   std::thread th([&plazza, nbThread] () {
-      Ui gui;
+      Ui gui(nbThread);
       gui.create();
 
       // main loop
@@ -46,10 +46,11 @@ int main(int argc, char *argv[]) {
 	  return;
 	}
 
-	for (int i : status) {
-	  std::cout << "process: " << i << ", nb of thread working: " << i << "/" << nbThread * 2 << std::endl;
+	int i = 0;
+	for (int thread : status) {
+	  std::cout << "process: " << i++ << ", nb of thread working: " << thread << "/" << nbThread * 2 << std::endl;
 	}
-	usleep(1000);
+	usleep(20);
 	gui.setProcessList(status);
 	gui.drawProcess();
 	gui.update();

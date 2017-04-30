@@ -118,17 +118,40 @@ void Plazza::killAll() {
   }
 }
 
-pid_t Plazza::getAvailableProcess() const {
+std::vector<int> Plazza::getProcessesStatus() {
+  std::vector<int> ret;
   for (auto const& process : _processes) {
-    pid_t pid = process.first;
     Package pkg = {OCCUPIED_SLOT, .content = {.value = -1}};
     auto const& com = process.second;
 
+    _interacting.lock();
     com->sendMsg(pkg);
     Package res = com->receiveMsg();
     while (res.type == UNDEFINED) {
       res = com->receiveMsg();
     }
+    _interacting.unlock();
+
+    ret.push_back(res.content.value);
+  }
+
+  return ret;
+}
+
+pid_t Plazza::getAvailableProcess() {
+  for (auto const& process : _processes) {
+    pid_t pid = process.first;
+    Package pkg = {OCCUPIED_SLOT, .content = {.value = -1}};
+    auto const& com = process.second;
+
+    _interacting.lock();
+    com->sendMsg(pkg);
+    Package res = com->receiveMsg();
+    while (res.type == UNDEFINED) {
+      res = com->receiveMsg();
+    }
+    _interacting.unlock();
+
     if (res.type == OCCUPIED_SLOT && res.content.value < _nbThread *2) {
       return pid;
     }
@@ -145,7 +168,7 @@ std::vector<Task> Plazza::readTask(std::string const& line) const {
     tokens.push_back(str);
   }
 
-  if (tokens.size() <= 1) {
+  if (tokens.size() < 2) {
     std::cerr << "Missing information or file" << std::endl;
     return {};
   }

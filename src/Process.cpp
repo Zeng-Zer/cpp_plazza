@@ -86,6 +86,7 @@ void Process::createThread(int id) {
 	  Option<Task> task = _tasks.timedPop(1000);
 	  if (task) {
 	    _thEmpty[id] = false;
+	    usleep(1000000);
 
 	    // parse file
 	    std::vector<std::string> result;

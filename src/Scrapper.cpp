@@ -45,14 +45,8 @@ std::vector<std::string> Scrapper::matchContent(std::string content, Information
 
   std::vector<std::string> res;
 
-  while (std::regex_search(content, m, _regex.at(info)) && res.size() < 6) {
-    res.push_back(m[0]);
-    if (info != IP_ADDRESS) {
-      return res;
-    }
-    content = m.suffix().str();
-  }
-
+  std::regex_search(content, m, _regex.at(info));
+  res.push_back(m[0]);
   return res;
 }
 
@@ -71,9 +65,9 @@ std::vector<std::string> Scrapper::parseDocument(std::string const& file, Inform
 		      std::istreambuf_iterator<char>());
 
   std::vector<std::string> res = matchContent(content, info);
-  if (info == IP_ADDRESS && res.empty()) {
-    res = caesar(content, info);
-  }
+  // if (info == IP_ADDRESS && res.empty()) {
+  //   res = caesar(content, info);
+  // }
 
   return res;
 }

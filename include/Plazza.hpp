@@ -32,7 +32,10 @@ public:
   /**
    * get processes status
    */
-  std::vector<int> getProcessesStatus();
+  std::vector<std::pair<int, pid_t>> getProcessesStatus();
+
+  void lock();
+  void unlock();
 
 private:
   /**
@@ -77,6 +80,7 @@ private:
   long _threadId;
   std::mutex _interacting;
   bool _stopped;
+  std::mutex _ui;
 };
 
 #endif /* !PLAZZA_HPP_ */

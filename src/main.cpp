@@ -1,4 +1,5 @@
 #include <iostream>
+#include <atomic>
 #include "Utils.hpp"
 #include "Plazza.hpp"
 #include "Exception.hpp"
@@ -35,31 +36,39 @@ int main(int argc, char *argv[]) {
   Plazza plazza(nbThread);
 
 #ifdef UI
-  std::thread th([&plazza, nbThread] () {
+  std::atomic<bool> started(false);
+
+  std::thread th([&plazza, nbThread, &started] () {
       Ui gui(nbThread);
       gui.create();
 
       // main loop
       while (1) {
-	std::vector<int> status = plazza.getProcessesStatus();
+	// plazza.lock();
+	std::vector<std::pair<int, pid_t>> status = plazza.getProcessesStatus();
+	// plazza.unlock();
 
 	if (plazza.stopped()) {
 	  return;
 	}
 
+	std::vector<int> processes;
 	int i = 0;
-	for (int thread : status) {
-	  std::cout << "process: " << i++ << ", nb of thread working: " << thread << "/" << nbThread * 2 << std::endl;
+	started = true;
+	for (auto const& thread : status) {
+	  std::cout << "process: " << i++ << ", nb of thread working: " << thread.first << "/" << nbThread * 2 << std::endl;
+	  processes.push_back(thread.first);
 	}
-	usleep(20);
-	gui.setProcessList(status);
+
+	gui.setProcessList(processes);
 	gui.drawProcess();
 	gui.update();
       }
 
     });
-#endif
 
+  while (started != true);
+#endif
   plazza.run();
 #ifdef UI
   th.join();

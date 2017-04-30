@@ -78,4 +78,3 @@ void Communication::rmfifo()
   unlink(oPath.c_str());
   unlink(iPath.c_str());
 }
-

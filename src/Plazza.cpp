@@ -16,9 +16,12 @@ Plazza::Plazza(int nbThread) : _nbThread(nbThread), _threadId(0), _stopped(false
     pid_t pid;
     int status;
 
+    // lock();
     while ((pid = waitpid(-1, &status, WNOHANG)) != -1) {
+      std::cout << "process deleted" << std::endl;
       deleteProcess(pid);
     }
+    // unlock();
   };
 
   struct sigaction sa;
@@ -54,11 +57,8 @@ void Plazza::run() {
 
   }
 
-  usleep(100000);
-  killAll();
-  usleep(100000);
-  while (!_processes.empty());
   _stopped = true;
+  while (!_processes.empty());
 }
 
 bool Plazza::stopped() const {
@@ -66,7 +66,24 @@ bool Plazza::stopped() const {
 }
 
 void Plazza::processTask(Task const& task) {
-  pid_t pid = getAvailableProcess();
+  std::vector<std::pair<int, pid_t>> status = getProcessesStatus();
+  int min = _nbThread * 2 + 1;
+  pid_t pid = -1;
+
+  int i = 0;
+  for (auto const& thread : status) {
+    std::cout << "process: " << i++ << ", nb of thread working: " << thread.first << "/" << _nbThread * 2 << std::endl;
+  }
+
+  for (auto const& stat : status) {
+    if (stat.first < _nbThread * 2) {
+      if (stat.first < min) {
+	min = stat.first;
+	pid = stat.second;
+      }
+    }
+  }
+
   if (pid == -1) {
     try {
       pid = createProcess();
@@ -124,29 +141,21 @@ void Plazza::killAll() {
   }
 }
 
-std::vector<int> Plazza::getProcessesStatus() {
-  std::vector<int> ret;
+std::vector<std::pair<int, pid_t>> Plazza::getProcessesStatus() {
+  std::vector<std::pair<int, pid_t>> ret;
   for (auto const& process : _processes) {
     Package pkg = {OCCUPIED_SLOT, .content = {.value = -1}};
     auto const& com = process.second;
 
     _interacting.lock();
-    if (_stopped) {
-      _interacting.unlock();
-      return {};
-    }
     com->sendMsg(pkg);
-    if (_stopped) {
-      _interacting.unlock();
-      return {};
-    }
     Package res = com->receiveMsg();
     while (res.type == UNDEFINED && !_stopped) {
       res = com->receiveMsg();
     }
     _interacting.unlock();
 
-    ret.push_back(res.content.value);
+    ret.push_back({res.content.value, process.first});
   }
 
   return ret;
@@ -208,4 +217,13 @@ std::vector<Task> Plazza::readTask(std::string const& line) const {
   }
 
   return tasks;
+}
+
+
+void Plazza::lock() {
+  _ui.lock();
+}
+
+void Plazza::unlock() {
+  _ui.unlock();
 }

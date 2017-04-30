@@ -25,15 +25,15 @@ SRC :=		main.cpp \
 SRCUI :=	Ui.cpp \
 		$(SRC)
 
-CXX :=		clang++
+CXX :=		g++
 CXXFLAGS :=	-W -Wall -Wextra -g -std=c++14 -pthread
-CXXFLAGS_UI :=	$(CXXFLAGS) -DUI -Iinclude/ -lsfml-graphics -lsfml-window -lsfml-system -lm
+CXXFLAGS_UI :=	$(CXXFLAGS) -DUI -lsfml-graphics -lsfml-window -lsfml-system -lm
 
 SRC :=		$(addprefix $(SRCDIR), $(SRC))
 SRCUI :=	$(addprefix $(SRCDIR), $(SRCUI))
 
 OBJ :=		$(SRC:.cpp=.o)
-OBJUI :=	$(SRCUI:.cpp=.o)
+OBJUI :=	$(SRCUI:.cpp=.o_ui)
 RM :=		rm -f
 
 DEFAULT :=	"\033[00;0m"
@@ -50,8 +50,8 @@ $(NAME): $(OBJ)
 	for file in $(shell find . | cut -c 3- | grep -P ".*\.(cpp|hpp|c|h)"); \
 		do fgrep -niH -e TODO -e FIXME $$file --color=auto; done; true
 
-ui:
-	$(CXX) -o $(NAME) $(SRCUI) $(CXXFLAGS_UI) && \
+ui: $(OBJUI)
+	$(CXX) -o $(NAME) $(OBJUI) $(CXXFLAGS_UI) && \
 		echo -e $(GREEN)"[BIN]"$(CYAN) $(NAME)$(DEFAULT) || \
 		echo -e $(RED)"[XX]"$(DEFAULT) $(NAME)
 	for file in $(shell find . | cut -c 3- | grep -P ".*\.(cpp|hpp|c|h)"); \
@@ -67,11 +67,16 @@ fclean:	clean
 
 re: fclean all
 
-.PHONY: all clean fclean re
+.PHONY: all ui clean fclean re
 
 .SILENT: all $(NAME) ui clean fclean re
 
 %.o: %.cpp
 	@$(CXX) -c $< -o $@ $(CXXFLAGS) $(foreach dir, $(INCLUDE), -I$(dir)) && \
+		echo -e $(GREEN)"[OK]"$(DEFAULT) $< || \
+		echo -e $(RED)"[KO]"$(DEFAULT) $<
+
+%.o_ui: %.cpp
+	@$(CXX) -c $< -o $@ $(CXXFLAGS) $(CXXFLAGS_UI) $(foreach dir, $(INCLUDE), -I$(dir)) && \
 		echo -e $(GREEN)"[OK]"$(DEFAULT) $< || \
 		echo -e $(RED)"[KO]"$(DEFAULT) $<

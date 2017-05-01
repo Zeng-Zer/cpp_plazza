@@ -58,6 +58,9 @@ void Ui::drawProcess()
   // std::cout << "nbSquareLine : " << nbSquareLine << std::endl;
   // std::cout << "Size : " << squareSize << std::endl << std::endl;
   _window.clear(sf::Color::Black);
+  if (_process.empty()) {
+    _modified = true;
+  }
   while (j < nbSquareLine)
     {
       i = 0;
@@ -83,12 +86,12 @@ void Ui::drawThreads(const unsigned nbThreadUsed, const unsigned xP, const unsig
   unsigned j = 0;
   unsigned index = 0;
   unsigned nbSquare = _nbThread;
-  std::cout << "SizeP : " << sizeP << std::endl;
-  std::cout << "nbSquare : " << nbSquare << std::endl;
+  // std::cout << "SizeP : " << sizeP << std::endl;
+  // std::cout << "nbSquare : " << nbSquare << std::endl;
   unsigned nbSquareLine = std::sqrt(nbSquare - 1) + 1;
   unsigned squareSize = sizeP / (std::sqrt(nbSquare - 1) + 1);
-  std::cout << "nbSquareLine : " << nbSquareLine << std::endl;
-  std::cout << "Size : " << squareSize << std::endl << std::endl;
+  // std::cout << "nbSquareLine : " << nbSquareLine << std::endl;
+  // std::cout << "Size : " << squareSize << std::endl << std::endl;
 
   while (j < nbSquareLine)
     {

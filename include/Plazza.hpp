@@ -32,12 +32,19 @@ public:
   /**
    * get processes status
    */
-  std::vector<std::pair<int, pid_t>> getProcessesStatus();
-
-  void lock();
-  void unlock();
+  std::vector<std::pair<int, pid_t>> getStatus() const;
 
 private:
+  /**
+   * parse stdin for tasks
+   */
+  void parseSTDIN();
+
+  /**
+   * get process status
+   */
+  std::vector<std::pair<int, pid_t>> getProcessesStatus();
+
   /**
    * create a new process
    */
@@ -59,12 +66,6 @@ private:
   void killAll();
 
   /**
-   * get a process that is available to work
-   * return -1 if there isn't any available process
-   */
-  pid_t getAvailableProcess();
-
-  /**
    * process task
    */
   void processTask(Task const& task);
@@ -78,9 +79,11 @@ private:
   int const _nbThread;
   std::map<pid_t, std::shared_ptr<ICommunication>> _processes;
   long _threadId;
-  std::mutex _interacting;
   bool _stopped;
-  std::mutex _ui;
+  BlockingQueue<Task> _tasks;
+  std::thread _stdin;
+  std::vector<std::pair<int, pid_t>> _status;
+  bool _deleted;
 };
 
 #endif /* !PLAZZA_HPP_ */

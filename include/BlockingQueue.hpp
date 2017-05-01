@@ -58,6 +58,9 @@ public:
       return {};
     }
 
+    if (_queue.empty()) {
+      return {};
+    }
     T elem(std::move(_queue.front()));
 
     _queue.pop();

@@ -50,7 +50,7 @@ std::vector<std::string> Scrapper::matchContent(std::string content, Information
   return res;
 }
 
-std::vector<std::string> Scrapper::parseDocument(std::string const& file, Information info) const {
+std::vector<std::string> Scrapper::parseDocument(std::string file, Information info) const {
   if (Utils::isDirectory(file)) {
     throw FileException(file + " is a directory");
   }

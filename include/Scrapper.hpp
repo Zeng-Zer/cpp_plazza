@@ -18,7 +18,7 @@ public:
   /**
    * parse a file to retrieve data
    */
-  std::vector<std::string> parseDocument(std::string const& file, Information info) const;
+  std::vector<std::string> parseDocument(std::string file, Information info) const;
 
   /**
    * match content with corresponding regex

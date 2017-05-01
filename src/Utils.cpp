@@ -35,6 +35,8 @@ std::string Utils::trim(std::string str) {
 bool Utils::isDirectory(std::string const& file) {
   struct stat path_stat;
 
-  stat(file.c_str(), &path_stat);
-  return !S_ISREG(path_stat.st_mode);
+  if (stat(file.c_str(), &path_stat) == 0) {
+    return S_ISDIR(path_stat.st_mode);
+  }
+  return true;
 }

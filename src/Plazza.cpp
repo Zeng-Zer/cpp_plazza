@@ -10,20 +10,14 @@
 #include "Exception.hpp"
 #include "Communication.hpp"
 
-static std::shared_ptr<ICommunication> *g_ptr;
-
-Plazza::Plazza(int nbThread) : _nbThread(nbThread), _threadId(0), _stopped(false) {
+Plazza::Plazza(int nbThread) : _nbThread(nbThread), _threadId(0), _stopped(false), _deleted(-1) {
   // handle child death
-  static auto handler = [this] (int sig) {
+  static auto handler = [this] (int) {
     pid_t pid;
     int status;
 
     while ((pid = waitpid(-1, &status, WNOHANG)) != -1) {
-      std::cout << "process deleted" << std::endl;
       deleteProcess(pid);
-    }
-    if (sig == SIGABRT || sig == SIGSEGV) {
-      *g_ptr = std::shared_ptr<ICommunication>(nullptr);
     }
   };
 
@@ -36,30 +30,44 @@ Plazza::Plazza(int nbThread) : _nbThread(nbThread), _threadId(0), _stopped(false
   sa.sa_flags = SA_RESTART;
 
   sigaction(SIGCHLD, &sa, NULL);
-  sigaction(SIGSEGV, &sa, NULL);
-  sigaction(SIGABRT, &sa, NULL);
 }
 
 Plazza::~Plazza() {
 }
 
+void Plazza::parseSTDIN() {
+  _stdin = std::thread([this]{
+      std::string line;
+      std::string cmd;
+
+      while (getline(std::cin, line)) {
+	std::istringstream ss(line);
+
+	while (getline(ss, cmd, ';')) {
+	  cmd = Utils::trim(cmd);
+
+	  std::vector<Task> tasks = readTask(cmd);
+
+	  std::for_each(tasks.begin(), tasks.end(), [this] (Task const& task) {
+	      _tasks.push(task);
+	    });
+	}
+
+      }
+      _stdin.detach();
+    });
+}
+
 void Plazza::run() {
-  std::string line;
-  std::string cmd;
-
-  while (getline(std::cin, line)) {
-    std::istringstream ss(line);
-
-    while (getline(ss, cmd, ';')) {
-      cmd = Utils::trim(cmd);
-
-      std::vector<Task> tasks = readTask(cmd);
-
-      std::for_each(tasks.begin(), tasks.end(), [this] (Task const& task) {
-	  processTask(task);
-	});
+  parseSTDIN();
+  while (_stdin.joinable()) {
+    _deleted = false;
+    _status = getProcessesStatus();
+    Option<Task> task = _tasks.timedPop(10);
+    if (task) {
+      usleep(10000);
+      processTask(*task);
     }
-
   }
 
   _stopped = true;
@@ -71,16 +79,10 @@ bool Plazza::stopped() const {
 }
 
 void Plazza::processTask(Task const& task) {
-  std::vector<std::pair<int, pid_t>> status = getProcessesStatus();
   int min = _nbThread * 2 + 1;
   pid_t pid = -1;
 
-  int i = 0;
-  for (auto const& thread : status) {
-    std::cout << "process: " << i++ << ", nb of thread working: " << thread.first << "/" << _nbThread * 2 << std::endl;
-  }
-
-  for (auto const& stat : status) {
+  for (auto const& stat : _status) {
     if (stat.first < _nbThread * 2) {
       if (stat.first < min) {
 	min = stat.first;
@@ -133,6 +135,7 @@ void Plazza::deleteProcess(pid_t pid) {
     return;
   }
 
+  _deleted = true;
   std::shared_ptr<ICommunication> com = _processes[pid];
 
   _processes.erase(_processes.find(pid));
@@ -146,50 +149,29 @@ void Plazza::killAll() {
   }
 }
 
+std::vector<std::pair<int, pid_t>> Plazza::getStatus() const {
+  return _status;
+}
+
 std::vector<std::pair<int, pid_t>> Plazza::getProcessesStatus() {
   std::vector<std::pair<int, pid_t>> ret;
   for (auto const& process : _processes) {
     Package pkg = {OCCUPIED_SLOT, .content = {.value = -1}};
     std::shared_ptr<ICommunication> com = process.second;
 
-    _interacting.lock();
     com->sendMsg(pkg);
-    g_ptr = &com;
     Package res = com->receiveMsg();
     while (res.type == UNDEFINED && !_stopped) {
-      if (!com) {
+      if (_deleted) {
 	return ret;
       }
       res = com->receiveMsg();
     }
-    _interacting.unlock();
 
     ret.push_back({res.content.value, process.first});
   }
 
   return ret;
-}
-
-pid_t Plazza::getAvailableProcess() {
-  for (auto const& process : _processes) {
-    pid_t pid = process.first;
-    Package pkg = {OCCUPIED_SLOT, .content = {.value = -1}};
-    auto const& com = process.second;
-
-    _interacting.lock();
-    com->sendMsg(pkg);
-    Package res;
-    *com >> res;
-    while (res.type == UNDEFINED) {
-      res = com->receiveMsg();
-    }
-    _interacting.unlock();
-
-    if (res.type == OCCUPIED_SLOT && res.content.value < _nbThread *2) {
-      return pid;
-    }
-  }
-  return -1;
 }
 
 std::vector<Task> Plazza::readTask(std::string const& line) const {
@@ -226,13 +208,4 @@ std::vector<Task> Plazza::readTask(std::string const& line) const {
   }
 
   return tasks;
-}
-
-
-void Plazza::lock() {
-  _ui.lock();
-}
-
-void Plazza::unlock() {
-  _ui.unlock();
 }

@@ -25,6 +25,8 @@ Process::~Process() {
 }
 
 void Process::run() {
+  _thEmpty.resize(_nbThread);
+  _threads.resize(_nbThread);
   for (int i = 0; i < _nbThread; ++i) {
     try {
       createThread(i);
@@ -76,40 +78,40 @@ void Process::handleMsg() {
 }
 
 void Process::createThread(int id) {
-  _thEmpty.push_back(true);
-  _threads.push_back(std::thread([this, id] {
-	Scrapper scrapper;
+  _thEmpty[id] = true;
+  _threads[id] = std::thread([this, id] {
+      Scrapper scrapper;
 
-	while (_running) {
-	  _thEmpty[id] = true;
+      while (_running) {
+	_thEmpty[id] = true;
 
-	  Option<Task> task = _tasks.timedPop(1000);
-	  if (task) {
-	    _thEmpty[id] = false;
-	    usleep(1000000);
+	Option<Task> task = _tasks.timedPop(1000);
+	if (task) {
+	  _thEmpty[id] = false;
+	  usleep(1000000);
 
-	    // parse file
-	    std::vector<std::string> result;
-	    try {
-	      result = scrapper.parseDocument(task->file, task->info);
-	    } catch (FileException const& e) {
-	      std::cerr << e.what() << std::endl;
+	  // parse file
+	  std::vector<std::string> result;
+	  try {
+	    result = scrapper.parseDocument(task->file, task->info);
+	  } catch (FileException const& e) {
+	    std::cerr << e.what() << std::endl;
+	  }
+
+	  // write the file
+	  if (!result.empty()) {
+	    _writeMutex.lock();
+	    for (std::string const& str : result) {
+	      std::cout << str << std::endl;
 	    }
-
-	    // write the file
-	    if (!result.empty()) {
-	      _writeMutex.lock();
-	      for (std::string const& str : result) {
-		std::cout << str << std::endl;
-	      }
-	      _writeMutex.unlock();
-	    }
-
+	    _writeMutex.unlock();
 	  }
 
 	}
 
-      }));
+      }
+
+    });
 }
 
 void Process::stop() {

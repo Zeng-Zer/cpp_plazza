@@ -45,7 +45,9 @@ int main(int argc, char *argv[]) {
 	std::vector<std::pair<int, pid_t>> status = plazza.getStatus();
 
 	std::vector<int> processes;
+	int i = 0;
 	for (auto const& thread : status) {
+	  std::cout << "process: " << i++ << ", nb of thread working: " << thread.first << ", capacity: " << nbThread * 2 << std::endl;
 	  processes.push_back(thread.first);
 	}
 

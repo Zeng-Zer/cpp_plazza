@@ -60,7 +60,7 @@ void Plazza::parseSTDIN() {
 
 void Plazza::run() {
   parseSTDIN();
-  while (_stdin.joinable()) {
+  while (_stdin.joinable() || !_tasks.empty() || !_status.empty()) {
     _deleted = false;
     _status = getProcessesStatus();
     Option<Task> task = _tasks.timedPop(10);
@@ -70,8 +70,8 @@ void Plazza::run() {
     }
   }
 
-  _stopped = true;
   while (!_processes.empty());
+  _stopped = true;
 }
 
 bool Plazza::stopped() const {
